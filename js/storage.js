@@ -1,37 +1,33 @@
-// ========== LOCAL STORAGE MANAGER ==========
 const Storage = {
     SAVES_KEY: 'puzzlecraft_saves',
 
     getAllSaves() {
         try {
-            const data = localStorage.getItem(this.SAVES_KEY);
-            return data ? JSON.parse(data) : {};
-        } catch {
-            return {};
+            return JSON.parse(localStorage.getItem(this.SAVES_KEY)) || {};
+        } catch { return {}; }
+    },
+
+    getSave(id) {
+        return this.getAllSaves()[id] || null;
+    },
+
+    savePuzzle(id, data) {
+        const saves = this.getAllSaves();
+        saves[id] = { ...data, lastPlayed: Date.now() };
+        try {
+            localStorage.setItem(this.SAVES_KEY, JSON.stringify(saves));
+        } catch (e) {
+            console.warn('Save failed:', e);
         }
     },
 
-    getSave(puzzleId) {
+    deleteSave(id) {
         const saves = this.getAllSaves();
-        return saves[puzzleId] || null;
-    },
-
-    savePuzzle(puzzleId, data) {
-        const saves = this.getAllSaves();
-        saves[puzzleId] = {
-            ...data,
-            lastPlayed: Date.now()
-        };
+        delete saves[id];
         localStorage.setItem(this.SAVES_KEY, JSON.stringify(saves));
     },
 
-    deleteSave(puzzleId) {
-        const saves = this.getAllSaves();
-        delete saves[puzzleId];
-        localStorage.setItem(this.SAVES_KEY, JSON.stringify(saves));
-    },
-
-    hasSave(puzzleId) {
-        return !!this.getSave(puzzleId);
+    hasSave(id) {
+        return !!this.getSave(id);
     }
 };
