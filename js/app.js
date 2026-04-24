@@ -1,53 +1,11 @@
 var PUZZLES = [
-    {
-        id: 'landscape-painting',
-        title: 'Manzara Resmi',
-        image: 'images/landscape-painting-nature-drawing.jpg',
-        pieces: 1000,
-        difficulty: 4
-    },
-    {
-        id: 'natural-drawing',
-        title: 'Doğal Çizim',
-        image: 'images/natural-drawing-nature-drawing.jpg',
-        pieces: 100,
-        difficulty: 1
-    },
-    {
-        id: 'japanese-forest',
-        title: 'Japon Ormanı',
-        image: 'images/japanese-landscape-painting-forest-painting.jpg',
-        pieces: 500,
-        difficulty: 3
-    },
-    {
-        id: 'digital-art',
-        title: 'Dijital Sanat',
-        image: 'images/art-artwork-illustration-drawing-hd-wallpaper-preview.jpg',
-        pieces: 250,
-        difficulty: 2
-    },
-    {
-        id: 'color-drawing',
-        title: 'Renkli Çizim',
-        image: 'images/drawing-wallpaper-preview.jpg',
-        pieces: 1000,
-        difficulty: 4
-    },
-    {
-        id: 'foggy-scenery',
-        title: 'Sisli Manzara',
-        image: 'images/foggy-scenery-3840x2160-14972.jpg',
-        pieces: 500,
-        difficulty: 3
-    },
-    {
-        id: 'abstract-landscape',
-        title: 'Soyut Manzara',
-        image: 'images/landscape-painting-abstract-landscape-real-painting.jpg',
-        pieces: 1000,
-        difficulty: 4
-    }
+    { id: 'landscape-painting', title: 'Manzara Resmi', image: './images/landscape-painting.jpg', pieces: 1000, difficulty: 4 },
+    { id: 'natural-drawing', title: 'Doğal Çizim', image: './images/natural-drawing.jpg', pieces: 100, difficulty: 1 },
+    { id: 'japanese-forest', title: 'Japon Ormanı', image: './images/japanese-forest.jpg', pieces: 500, difficulty: 3 },
+    { id: 'digital-art', title: 'Dijital Sanat', image: './images/digital-art.jpg', pieces: 250, difficulty: 2 },
+    { id: 'color-drawing', title: 'Renkli Çizim', image: './images/color-drawing.jpg', pieces: 1000, difficulty: 4 },
+    { id: 'foggy-scenery', title: 'Sisli Manzara', image: './images/foggy-scenery.jpg', pieces: 500, difficulty: 3 },
+    { id: 'abstract-landscape', title: 'Soyut Manzara', image: './images/abstract-landscape.jpg', pieces: 1000, difficulty: 4 }
 ];
 
 var currentGame = null;
@@ -80,11 +38,11 @@ function toggleTheme() {
 }
 
 function updateThemeIcon(t) {
-    var i = document.querySelector('.theme-toggle i');
-    if (i) i.className = t === 'dark' ? 'fas fa-moon' : 'fas fa-sun';
+    var icon = document.querySelector('.theme-toggle i');
+    if (icon) icon.className = t === 'dark' ? 'fas fa-moon' : 'fas fa-sun';
 }
 
-// ── NAV ──
+// ── NAVIGATION ──
 function showHome() {
     document.getElementById('hero-section').classList.remove('hidden');
     document.querySelector('.announcements').classList.remove('hidden');
@@ -124,7 +82,11 @@ function showGame() {
 function setActiveNav(page) {
     var links = document.querySelectorAll('.nav-link');
     for (var i = 0; i < links.length; i++) {
-        links[i].classList.toggle('active', links[i].dataset.page === page);
+        if (links[i].dataset.page === page) {
+            links[i].classList.add('active');
+        } else {
+            links[i].classList.remove('active');
+        }
     }
 }
 
@@ -132,7 +94,7 @@ function scrollToPuzzles() {
     document.getElementById('puzzles').scrollIntoView({ behavior: 'smooth' });
 }
 
-// ── GRID ──
+// ── PUZZLE GRID ──
 function renderPuzzleGrid() {
     var grid = document.getElementById('puzzle-grid');
     grid.innerHTML = '';
@@ -160,10 +122,10 @@ function renderPuzzleGrid() {
             dots += '<div class="diff-dot ' + (d < puzzle.difficulty ? 'active' : '') + '"></div>';
         }
 
-        var saveHtml = '';
+        var saveHTML = '';
         if (hasSave) {
-            saveHtml = '<div class="card-progress-bar"><div class="card-progress-fill" style="width:' + progress + '%"></div></div>' +
-                '<div class="card-saved-info"><span>%' + progress + ' tamamlandı</span><span>' + timeAgo(save.lastPlayed) + '</span></div>';
+            saveHTML = '<div class="card-progress-bar"><div class="card-progress-fill" style="width:' + progress + '%"></div></div>';
+            saveHTML += '<div class="card-saved-info"><span>%' + progress + ' tamamlandı</span><span>' + timeAgo(save.lastPlayed) + '</span></div>';
         }
 
         var card = document.createElement('div');
@@ -171,18 +133,18 @@ function renderPuzzleGrid() {
         card.setAttribute('data-puzzle-id', puzzle.id);
         card.innerHTML =
             '<div class="card-image">' +
-            '<img src="' + puzzle.image + '" alt="' + puzzle.title + '" loading="lazy">' +
-            '<div class="card-overlay"><div class="play-btn-overlay"><i class="fas fa-play"></i></div></div>' +
-            '<span class="piece-badge ' + badgeClass + '">' + puzzle.pieces + ' Parça</span>' +
-            '<div class="difficulty-dots">' + dots + '</div>' +
+                '<img src="' + puzzle.image + '" alt="' + puzzle.title + '" loading="lazy">' +
+                '<div class="card-overlay"><div class="play-btn-overlay"><i class="fas fa-play"></i></div></div>' +
+                '<span class="piece-badge ' + badgeClass + '">' + puzzle.pieces + ' Parça</span>' +
+                '<div class="difficulty-dots">' + dots + '</div>' +
             '</div>' +
             '<div class="card-body">' +
-            '<div class="card-title">' + puzzle.title + '</div>' +
-            '<div class="card-meta">' +
-            '<div class="card-pieces"><i class="fas fa-puzzle-piece"></i><span>' + puzzle.pieces + ' parça</span></div>' +
-            '<button class="card-action">' + (hasSave ? '<i class="fas fa-play"></i> Devam Et' : '<i class="fas fa-play"></i> Başla') + '</button>' +
-            '</div>' +
-            saveHtml +
+                '<div class="card-title">' + puzzle.title + '</div>' +
+                '<div class="card-meta">' +
+                    '<div class="card-pieces"><i class="fas fa-puzzle-piece"></i><span>' + puzzle.pieces + ' parça</span></div>' +
+                    '<button class="card-action">' + (hasSave ? '<i class="fas fa-play"></i> Devam Et' : '<i class="fas fa-play"></i> Başla') + '</button>' +
+                '</div>' +
+                saveHTML +
             '</div>';
 
         (function (pid) {
@@ -201,12 +163,16 @@ function filterPuzzles(f) {
     for (var i = 0; i < btns.length; i++) {
         var txt = btns[i].textContent.trim();
         var val = txt === 'Tümü' ? 'all' : parseInt(txt);
-        btns[i].classList.toggle('active', val === f);
+        if (val === f) {
+            btns[i].classList.add('active');
+        } else {
+            btns[i].classList.remove('active');
+        }
     }
     renderPuzzleGrid();
 }
 
-// ── SAVED ──
+// ── SAVED GAMES ──
 function renderSavedGames() {
     var grid = document.getElementById('saved-grid');
     var noEl = document.getElementById('no-saves');
@@ -223,6 +189,7 @@ function renderSavedGames() {
     noEl.classList.add('hidden');
     grid.innerHTML = '';
 
+    // sort by last played
     keys.sort(function (a, b) {
         return (saves[b].lastPlayed || 0) - (saves[a].lastPlayed || 0);
     });
@@ -247,29 +214,31 @@ function renderSavedGames() {
         card.className = 'puzzle-card';
         card.innerHTML =
             '<div class="card-image">' +
-            '<img src="' + puzzle.image + '" alt="' + puzzle.title + '" loading="lazy">' +
-            '<div class="card-overlay"><div class="play-btn-overlay"><i class="fas fa-play"></i></div></div>' +
-            '<span class="piece-badge ' + badgeClass + '">' + puzzle.pieces + ' Parça</span>' +
+                '<img src="' + puzzle.image + '" alt="' + puzzle.title + '" loading="lazy">' +
+                '<div class="card-overlay"><div class="play-btn-overlay"><i class="fas fa-play"></i></div></div>' +
+                '<span class="piece-badge ' + badgeClass + '">' + puzzle.pieces + ' Parça</span>' +
             '</div>' +
             '<div class="card-body">' +
-            '<div class="card-title">' + puzzle.title + '</div>' +
-            '<div class="card-meta">' +
-            '<div class="card-pieces"><i class="fas fa-puzzle-piece"></i><span>' + (save.placedCount || 0) + '/' + (save.totalPieces || puzzle.pieces) + '</span></div>' +
-            '<button class="card-action"><i class="fas fa-play"></i> Devam Et</button>' +
-            '</div>' +
-            '<div class="card-progress-bar"><div class="card-progress-fill" style="width:' + progress + '%"></div></div>' +
-            '<div class="card-saved-info"><span>%' + progress + '</span><span>' + timeAgo(save.lastPlayed) + '</span></div>' +
+                '<div class="card-title">' + puzzle.title + '</div>' +
+                '<div class="card-meta">' +
+                    '<div class="card-pieces"><i class="fas fa-puzzle-piece"></i><span>' + (save.placedCount || 0) + '/' + (save.totalPieces || puzzle.pieces) + '</span></div>' +
+                    '<button class="card-action"><i class="fas fa-play"></i> Devam Et</button>' +
+                '</div>' +
+                '<div class="card-progress-bar"><div class="card-progress-fill" style="width:' + progress + '%"></div></div>' +
+                '<div class="card-saved-info"><span>%' + progress + '</span><span>' + timeAgo(save.lastPlayed) + '</span></div>' +
             '</div>';
 
         (function (id) {
-            card.addEventListener('click', function () { startPuzzle(id); });
+            card.addEventListener('click', function () {
+                startPuzzle(id);
+            });
         })(pid);
 
         grid.appendChild(card);
     }
 }
 
-// ── GAME ──
+// ── START PUZZLE ──
 function startPuzzle(puzzleId) {
     var puzzle = null;
     for (var i = 0; i < PUZZLES.length; i++) {
@@ -304,9 +273,9 @@ function startPuzzle(puzzleId) {
         createConfetti();
     };
 
-    currentGame.load(saved).catch(function (e) {
-        console.error(e);
-        alert('Resim yüklenemedi. Dosya adını kontrol edin.\n\nBeklenen: ' + puzzle.image);
+    currentGame.load(saved).catch(function (err) {
+        console.error(err);
+        alert('Resim yüklenemedi: ' + puzzle.title + '\n\nLütfen images klasöründe dosyanın olduğundan emin olun.');
         exitGame();
     });
 }
@@ -329,27 +298,71 @@ function replayPuzzle() {
     startPuzzle(pid);
 }
 
-// ── CONTROLS ──
+// ── TOOLBAR CONTROLS ──
 function togglePreview() {
     document.getElementById('preview-overlay').classList.toggle('hidden');
 }
 
 function toggleEdgeMode() {
-    if (currentGame) {
-        var a = currentGame.toggleEdges();
-        document.getElementById('edge-btn').classList.toggle('active', a);
+    if (!currentGame) return;
+    var active = currentGame.toggleEdges();
+    if (active) {
+        document.getElementById('edge-btn').classList.add('active');
+    } else {
+        document.getElementById('edge-btn').classList.remove('active');
     }
 }
 
-function doZoomIn() { if (currentGame) currentGame.zoomIn(); }
-function doZoomOut() { if (currentGame) currentGame.zoomOut(); }
-function doResetZoom() { if (currentGame) currentGame.resetZoom(); }
+function doZoomIn() {
+    if (currentGame) currentGame.zoomIn();
+}
+
+function doZoomOut() {
+    if (currentGame) currentGame.zoomOut();
+}
+
+function doResetZoom() {
+    if (currentGame) currentGame.resetZoom();
+}
 
 // ── CONFETTI ──
 function createConfetti() {
-    var c = document.getElementById('confetti');
-    c.innerHTML = '';
+    var container = document.getElementById('confetti');
+    container.innerHTML = '';
+
     if (!document.getElementById('confetti-style')) {
-        var s = document.createElement('style');
-        s.id = 'confetti-style';
-        s.textContent 
+        var style = document.createElement('style');
+        style.id = 'confetti-style';
+        style.textContent = '@keyframes confFall{0%{transform:translateY(0) rotate(0);opacity:1}100%{transform:translateY(500px) rotate(720deg);opacity:0}}';
+        document.head.appendChild(style);
+    }
+
+    var colors = ['#6c5ce7', '#a29bfe', '#fd79a8', '#00cec9', '#fdcb6e', '#e17055'];
+
+    for (var i = 0; i < 50; i++) {
+        var d = document.createElement('div');
+        var w = 5 + Math.random() * 8;
+        var h = 5 + Math.random() * 8;
+        var color = colors[Math.floor(Math.random() * 6)];
+        var left = Math.random() * 100;
+        var dur = 2 + Math.random() * 2;
+        var delay = Math.random() * 0.5;
+        var br = Math.random() > 0.5 ? '50%' : '2px';
+
+        d.style.cssText = 'position:absolute;width:' + w + 'px;height:' + h + 'px;background:' + color + ';left:' + left + '%;top:-10px;border-radius:' + br + ';animation:confFall ' + dur + 's ease-in forwards;animation-delay:' + delay + 's;opacity:.85;';
+        container.appendChild(d);
+    }
+}
+
+// ── UTILITY ──
+function timeAgo(ts) {
+    if (!ts) return '';
+    var d = Date.now() - ts;
+    var m = Math.floor(d / 60000);
+    var h = Math.floor(d / 3600000);
+    var dy = Math.floor(d / 86400000);
+    if (m < 1) return 'Az önce';
+    if (m < 60) return m + ' dk önce';
+    if (h < 24) return h + ' saat önce';
+    return dy + ' gün önce';
+}
