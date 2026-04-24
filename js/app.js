@@ -273,13 +273,15 @@ function startPuzzle(puzzleId) {
         createConfetti();
     };
 
-    currentGame.load(saved).catch(function (err) {
+    currentGame.load(saved).then(function () {
+        // Puzzle yüklendi, UI'ı güncelle
+        currentGame._updateUI();
+    }).catch(function (err) {
         console.error(err);
         alert('Resim yüklenemedi: ' + puzzle.title + '\n\nLütfen images klasöründe dosyanın olduğundan emin olun.');
         exitGame();
     });
 }
-
 function exitGame() {
     if (currentGame) {
         currentGame._autoSave();
