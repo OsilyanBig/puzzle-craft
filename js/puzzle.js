@@ -10,17 +10,15 @@ class PuzzleGame {
         this.pieces = [];
         this.cols = 0;
         this.rows = 0;
-        this.pw = 0;   // piece width in puzzle coords
-        this.ph = 0;   // piece height in puzzle coords
+        this.pw = 0;
+        this.ph = 0;
         this.tab = 0;
         this.snapDist = 0;
 
-        // view
         this.panX = 0;
         this.panY = 0;
         this.scale = 1;
 
-        // interaction
         this.dragPiece = null;
         this.dragOffX = 0;
         this.dragOffY = 0;
@@ -28,10 +26,7 @@ class PuzzleGame {
         this.panStartX = 0;
         this.panStartY = 0;
         this.pointerDown = false;
-        this.pointerX = 0;
-        this.pointerY = 0;
 
-        // state
         this.running = false;
         this.completed = false;
         this.showEdges = false;
@@ -40,16 +35,13 @@ class PuzzleGame {
         this.timerInterval = null;
 
         this.onComplete = null;
-
         this._boundRender = this._renderLoop.bind(this);
         this._bindInput();
     }
 
-    /* ───── LOAD ───── */
     load(savedState) {
         return new Promise((resolve, reject) => {
             this.img = new Image();
-            this.img.crossOrigin = 'anonymous';
 
             this.img.onload = () => {
                 this._setup();
@@ -68,20 +60,13 @@ class PuzzleGame {
             };
 
             this.img.onerror = () => {
-                // retry with CORS proxy
-                if (!this._retried) {
-                    this._retried = true;
-                    this.img.src = 'https://corsproxy.io/?' + encodeURIComponent(this.imageUrl);
-                } else {
-                    reject(new Error('Image failed'));
-                }
+                reject(new Error('Image failed to load: ' + this.imageUrl));
             };
 
             this.img.src = this.imageUrl;
         });
     }
 
-    /* ───── SETUP GRID ───── */
     _setup() {
         const ratio = this.img.width / this.img.height;
         this.cols = Math.round(Math.sqrt(this.requestedPieces * ratio));
@@ -90,7 +75,6 @@ class PuzzleGame {
         if (this.rows < 2) this.rows = 2;
         this.totalPieces = this.cols * this.rows;
 
-        // puzzle image size in world coords (cap it for performance)
         const maxDim = 1400;
         const sc = maxDim / Math.max(this.img.width, this.img.height);
         this.imgW = this.img.width * sc;
@@ -102,11 +86,9 @@ class PuzzleGame {
         this.snapDist = Math.min(this.pw, this.ph) * 0.3;
     }
 
-    /* ───── GENERATE PIECES ───── */
     _generate() {
-        // build tab directions between cells
-        this.edgesH = []; // horizontal edges (between row r and r+1)
-        this.edgesV = []; // vertical edges (between col c and c+1)
+        this.edgesH = [];
+        this.edgesV = [];
 
         for (let r = 0; r < this.rows - 1; r++) {
             this.edgesH[r] = [];
@@ -126,29 +108,28 @@ class PuzzleGame {
             for (let c = 0; c < this.cols; c++) {
                 this.pieces.push({
                     id: r * this.cols + c,
-                    r, c,
-                    // current world position
+                    r: r,
+                    c: c,
                     x: c * this.pw,
                     y: r * this.ph,
-                    // correct position
                     cx: c * this.pw,
                     cy: r * this.ph,
                     group: r * this.cols + c,
                     placed: false,
                     edge: r === 0 || r === this.rows - 1 || c === 0 || c === this.cols - 1,
-                    // tab info
-                    top:    r > 0              ? -this.edgesH[r-1][c] : 0,
-                    bottom: r < this.rows - 1  ?  this.edgesH[r][c]   : 0,
-                    left:   c > 0              ? -this.edgesV[r][c-1] : 0,
-                    right:  c < this.cols - 1  ?  this.edgesV[r][c]   : 0,
+                    top: r > 0 ? -this.edgesH[r - 1][c] : 0,
+                    bottom: r < this.rows - 1 ? this.edgesH[r][c] : 0,
+                    left: c > 0 ? -this.edgesV[r][c - 1] : 0,
+                    right: c < this.cols - 1 ? this.edgesV[r][c] : 0
                 });
             }
         }
     }
 
     _scatter() {
-        const spread = Math.max(this.imgW, this.imgH) * 1.5;
-        for (const p of this.pieces) {
+        var spread = Math.max(this.imgW, this.imgH) * 1.5;
+        for (var i = 0; i < this.pieces.length; i++) {
+            var p = this.pieces[i];
             p.x = -spread / 2 + Math.random() * spread * 2;
             p.y = -spread / 4 + Math.random() * spread * 1.5;
             p.placed = false;
@@ -157,14 +138,18 @@ class PuzzleGame {
     }
 
     _centerView() {
-        const area = document.getElementById('game-area');
+        var area = document.getElementById('game-area');
         if (!area) return;
-        this.scale = Math.min(area.clientWidth / (this.imgW * 1.5), area.clientHeight / (this.imgH * 1.5), 1);
+        this.scale = Math.min(
+            area.clientWidth / (this.imgW * 1.5),
+            area.clientHeight / (this.imgH * 1.5),
+            1
+        );
         this.panX = area.clientWidth / 2 - (this.imgW / 2) * this.scale;
         this.panY = area.clientHeight / 2 - (this.imgH / 2) * this.scale;
     }
 
-    /* ───── RENDER ───── */
+    // ─── RENDER ───
     _renderLoop() {
         if (!this.running) return;
         this._draw();
@@ -172,8 +157,10 @@ class PuzzleGame {
     }
 
     _draw() {
-        const { canvas, ctx } = this;
-        const area = canvas.parentElement;
+        var canvas = this.canvas;
+        var ctx = this.ctx;
+        var area = canvas.parentElement;
+
         canvas.width = area.clientWidth;
         canvas.height = area.clientHeight;
 
@@ -182,32 +169,46 @@ class PuzzleGame {
         ctx.translate(this.panX, this.panY);
         ctx.scale(this.scale, this.scale);
 
-        // target outline
+        // target area
         ctx.save();
         ctx.strokeStyle = 'rgba(108,92,231,0.25)';
         ctx.lineWidth = 2 / this.scale;
         ctx.setLineDash([10 / this.scale, 10 / this.scale]);
         ctx.strokeRect(0, 0, this.imgW, this.imgH);
         ctx.setLineDash([]);
+
         // grid
         ctx.strokeStyle = 'rgba(108,92,231,0.07)';
         ctx.lineWidth = 1 / this.scale;
-        for (let c = 1; c < this.cols; c++) { ctx.beginPath(); ctx.moveTo(c * this.pw, 0); ctx.lineTo(c * this.pw, this.imgH); ctx.stroke(); }
-        for (let r = 1; r < this.rows; r++) { ctx.beginPath(); ctx.moveTo(0, r * this.ph); ctx.lineTo(this.imgW, r * this.ph); ctx.stroke(); }
+        for (var c = 1; c < this.cols; c++) {
+            ctx.beginPath();
+            ctx.moveTo(c * this.pw, 0);
+            ctx.lineTo(c * this.pw, this.imgH);
+            ctx.stroke();
+        }
+        for (var r = 1; r < this.rows; r++) {
+            ctx.beginPath();
+            ctx.moveTo(0, r * this.ph);
+            ctx.lineTo(this.imgW, r * this.ph);
+            ctx.stroke();
+        }
         ctx.restore();
 
-        // sort: placed → unplaced, dragged on top
-        const sorted = [...this.pieces].sort((a, b) => {
-            if (a.placed !== b.placed) return a.placed ? -1 : 1;
-            if (this.dragPiece) {
-                const ag = a.group === this.dragPiece.group ? 1 : 0;
-                const bg = b.group === this.dragPiece.group ? 1 : 0;
+        // sort pieces
+        var self = this;
+        var sorted = this.pieces.slice().sort(function (a, b) {
+            if (a.placed && !b.placed) return -1;
+            if (!a.placed && b.placed) return 1;
+            if (self.dragPiece) {
+                var ag = a.group === self.dragPiece.group ? 1 : 0;
+                var bg = b.group === self.dragPiece.group ? 1 : 0;
                 if (ag !== bg) return ag - bg;
             }
             return 0;
         });
 
-        for (const p of sorted) {
+        for (var i = 0; i < sorted.length; i++) {
+            var p = sorted[i];
             if (this.showEdges && !p.edge && !p.placed) continue;
             this._drawPiece(p);
         }
@@ -216,18 +217,19 @@ class PuzzleGame {
     }
 
     _drawPiece(p) {
-        const { ctx, pw, ph, tab } = this;
+        var ctx = this.ctx;
+        var pw = this.pw;
+        var ph = this.ph;
+        var tab = this.tab;
 
         ctx.save();
         ctx.translate(p.x, p.y);
 
-        // clip path
-        ctx.beginPath();
-        this._piecePath(ctx, p);
-        ctx.closePath();
-
-        // shadow for unplaced
+        // shadow
         if (!p.placed) {
+            ctx.beginPath();
+            this._piecePath(ctx, p);
+            ctx.closePath();
             ctx.shadowColor = 'rgba(0,0,0,0.5)';
             ctx.shadowBlur = 8 / this.scale;
             ctx.shadowOffsetX = 3 / this.scale;
@@ -235,32 +237,48 @@ class PuzzleGame {
             ctx.fillStyle = '#000';
             ctx.fill();
             ctx.shadowColor = 'transparent';
+            ctx.shadowBlur = 0;
+            ctx.shadowOffsetX = 0;
+            ctx.shadowOffsetY = 0;
         }
 
+        // clip and draw image
         ctx.beginPath();
         this._piecePath(ctx, p);
         ctx.closePath();
         ctx.save();
         ctx.clip();
 
-        // draw the image portion (with tab margin)
-        const srcScaleX = this.img.width / this.imgW;
-        const srcScaleY = this.img.height / this.imgH;
+        var srcScaleX = this.img.width / this.imgW;
+        var srcScaleY = this.img.height / this.imgH;
 
-        const sx = (p.cx - tab) * srcScaleX;
-        const sy = (p.cy - tab) * srcScaleY;
-        const sWidth = (pw + tab * 2) * srcScaleX;
-        const sHeight = (ph + tab * 2) * srcScaleY;
+        var sx = (p.cx - tab) * srcScaleX;
+        var sy = (p.cy - tab) * srcScaleY;
+        var sWidth = (pw + tab * 2) * srcScaleX;
+        var sHeight = (ph + tab * 2) * srcScaleY;
 
-        ctx.drawImage(
-            this.img,
-            sx, sy, sWidth, sHeight,
-            -tab, -tab, pw + tab * 2, ph + tab * 2
-        );
+        // clamp source coords
+        var sx2 = Math.max(0, sx);
+        var sy2 = Math.max(0, sy);
+        var sRight = Math.min(this.img.width, sx + sWidth);
+        var sBottom = Math.min(this.img.height, sy + sHeight);
+
+        var destX = -tab + (sx2 - sx) / srcScaleX;
+        var destY = -tab + (sy2 - sy) / srcScaleY;
+        var destW = (sRight - sx2) / srcScaleX;
+        var destH = (sBottom - sy2) / srcScaleY;
+
+        if (destW > 0 && destH > 0) {
+            ctx.drawImage(
+                this.img,
+                sx2, sy2, sRight - sx2, sBottom - sy2,
+                destX, destY, destW, destH
+            );
+        }
 
         ctx.restore();
 
-        // stroke
+        // outline
         ctx.beginPath();
         this._piecePath(ctx, p);
         ctx.closePath();
@@ -272,9 +290,11 @@ class PuzzleGame {
     }
 
     _piecePath(ctx, p) {
-        const { pw, ph, tab } = this;
-        const neck = 0.5;  // how narrow the neck is (0-1)
-        const tabW = 0.3;  // tab width as fraction of edge
+        var pw = this.pw;
+        var ph = this.ph;
+        var tab = this.tab;
+        var neck = 0.5;
+        var tabW = 0.3;
 
         ctx.moveTo(0, 0);
 
@@ -282,7 +302,7 @@ class PuzzleGame {
         if (p.top === 0) {
             ctx.lineTo(pw, 0);
         } else {
-            const d = p.top;
+            var d = p.top;
             ctx.lineTo(pw * (0.5 - tabW / 2), 0);
             ctx.bezierCurveTo(
                 pw * (0.5 - tabW / 2), d * -tab * neck,
@@ -301,7 +321,7 @@ class PuzzleGame {
         if (p.right === 0) {
             ctx.lineTo(pw, ph);
         } else {
-            const d = p.right;
+            var d = p.right;
             ctx.lineTo(pw, ph * (0.5 - tabW / 2));
             ctx.bezierCurveTo(
                 pw + d * tab * neck, ph * (0.5 - tabW / 2),
@@ -320,7 +340,7 @@ class PuzzleGame {
         if (p.bottom === 0) {
             ctx.lineTo(0, ph);
         } else {
-            const d = p.bottom;
+            var d = p.bottom;
             ctx.lineTo(pw * (0.5 + tabW / 2), ph);
             ctx.bezierCurveTo(
                 pw * (0.5 + tabW / 2), ph + d * tab * neck,
@@ -339,7 +359,7 @@ class PuzzleGame {
         if (p.left === 0) {
             ctx.lineTo(0, 0);
         } else {
-            const d = p.left;
+            var d = p.left;
             ctx.lineTo(0, ph * (0.5 + tabW / 2));
             ctx.bezierCurveTo(
                 d * -tab * neck, ph * (0.5 + tabW / 2),
@@ -355,27 +375,44 @@ class PuzzleGame {
         }
     }
 
-    /* ───── INPUT ───── */
+    // ─── INPUT ───
     _bindInput() {
-        const c = this.canvas;
-        c.addEventListener('mousedown', e => { e.preventDefault(); this._down(e.offsetX, e.offsetY, e.button); });
-        c.addEventListener('mousemove', e => this._move(e.offsetX, e.offsetY));
-        c.addEventListener('mouseup', () => this._up());
-        c.addEventListener('mouseleave', () => this._up());
-        c.addEventListener('wheel', e => { e.preventDefault(); this._wheel(e); }, { passive: false });
-        c.addEventListener('contextmenu', e => e.preventDefault());
+        var self = this;
+        var c = this.canvas;
 
-        c.addEventListener('touchstart', e => {
+        c.addEventListener('mousedown', function (e) {
             e.preventDefault();
-            const t = e.touches[0], r = c.getBoundingClientRect();
-            this._down(t.clientX - r.left, t.clientY - r.top, 0);
-        }, { passive: false });
-        c.addEventListener('touchmove', e => {
+            self._down(e.offsetX, e.offsetY, e.button);
+        });
+        c.addEventListener('mousemove', function (e) {
+            self._move(e.offsetX, e.offsetY);
+        });
+        c.addEventListener('mouseup', function () { self._up(); });
+        c.addEventListener('mouseleave', function () { self._up(); });
+        c.addEventListener('wheel', function (e) {
             e.preventDefault();
-            const t = e.touches[0], r = c.getBoundingClientRect();
-            this._move(t.clientX - r.left, t.clientY - r.top);
+            self._wheel(e);
         }, { passive: false });
-        c.addEventListener('touchend', e => { e.preventDefault(); this._up(); }, { passive: false });
+        c.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+
+        c.addEventListener('touchstart', function (e) {
+            e.preventDefault();
+            var t = e.touches[0];
+            var r = c.getBoundingClientRect();
+            self._down(t.clientX - r.left, t.clientY - r.top, 0);
+        }, { passive: false });
+
+        c.addEventListener('touchmove', function (e) {
+            e.preventDefault();
+            var t = e.touches[0];
+            var r = c.getBoundingClientRect();
+            self._move(t.clientX - r.left, t.clientY - r.top);
+        }, { passive: false });
+
+        c.addEventListener('touchend', function (e) {
+            e.preventDefault();
+            self._up();
+        }, { passive: false });
     }
 
     _screenToWorld(sx, sy) {
@@ -386,12 +423,11 @@ class PuzzleGame {
     }
 
     _hitTest(wx, wy) {
-        // reverse order (top-most first)
-        for (let i = this.pieces.length - 1; i >= 0; i--) {
-            const p = this.pieces[i];
+        for (var i = this.pieces.length - 1; i >= 0; i--) {
+            var p = this.pieces[i];
             if (p.placed) continue;
             if (this.showEdges && !p.edge) continue;
-            const m = this.tab;
+            var m = this.tab;
             if (wx >= p.x - m && wx <= p.x + this.pw + m &&
                 wy >= p.y - m && wy <= p.y + this.ph + m) {
                 return p;
@@ -402,23 +438,33 @@ class PuzzleGame {
 
     _down(sx, sy, btn) {
         this.pointerDown = true;
-        this.pointerX = sx;
-        this.pointerY = sy;
 
-        if (btn === 2) { this.isPanning = true; this.panStartX = sx - this.panX; this.panStartY = sy - this.panY; return; }
+        if (btn === 2) {
+            this.isPanning = true;
+            this.panStartX = sx - this.panX;
+            this.panStartY = sy - this.panY;
+            return;
+        }
 
-        const w = this._screenToWorld(sx, sy);
-        const hit = this._hitTest(w.x, w.y);
+        var w = this._screenToWorld(sx, sy);
+        var hit = this._hitTest(w.x, w.y);
 
         if (hit) {
             this.dragPiece = hit;
             this.dragOffX = w.x - hit.x;
             this.dragOffY = w.y - hit.y;
-            // bring group to top
-            const gid = hit.group;
-            const inGroup = this.pieces.filter(p => p.group === gid);
-            const rest = this.pieces.filter(p => p.group !== gid);
-            this.pieces = [...rest, ...inGroup];
+
+            var gid = hit.group;
+            var inGroup = [];
+            var rest = [];
+            for (var i = 0; i < this.pieces.length; i++) {
+                if (this.pieces[i].group === gid) {
+                    inGroup.push(this.pieces[i]);
+                } else {
+                    rest.push(this.pieces[i]);
+                }
+            }
+            this.pieces = rest.concat(inGroup);
         } else {
             this.isPanning = true;
             this.panStartX = sx - this.panX;
@@ -436,14 +482,18 @@ class PuzzleGame {
         }
 
         if (this.dragPiece) {
-            const w = this._screenToWorld(sx, sy);
-            const nx = w.x - this.dragOffX;
-            const ny = w.y - this.dragOffY;
-            const dx = nx - this.dragPiece.x;
-            const dy = ny - this.dragPiece.y;
-            const gid = this.dragPiece.group;
-            for (const p of this.pieces) {
-                if (p.group === gid) { p.x += dx; p.y += dy; }
+            var w = this._screenToWorld(sx, sy);
+            var nx = w.x - this.dragOffX;
+            var ny = w.y - this.dragOffY;
+            var dx = nx - this.dragPiece.x;
+            var dy = ny - this.dragPiece.y;
+            var gid = this.dragPiece.group;
+
+            for (var i = 0; i < this.pieces.length; i++) {
+                if (this.pieces[i].group === gid) {
+                    this.pieces[i].x += dx;
+                    this.pieces[i].y += dy;
+                }
             }
         }
     }
@@ -460,47 +510,54 @@ class PuzzleGame {
     }
 
     _wheel(e) {
-        const factor = e.deltaY > 0 ? 0.9 : 1.1;
-        const newScale = Math.max(0.1, Math.min(5, this.scale * factor));
-        const wx = (e.offsetX - this.panX) / this.scale;
-        const wy = (e.offsetY - this.panY) / this.scale;
+        var factor = e.deltaY > 0 ? 0.9 : 1.1;
+        var newScale = Math.max(0.1, Math.min(5, this.scale * factor));
+        var wx = (e.offsetX - this.panX) / this.scale;
+        var wy = (e.offsetY - this.panY) / this.scale;
         this.scale = newScale;
         this.panX = e.offsetX - wx * this.scale;
         this.panY = e.offsetY - wy * this.scale;
     }
 
-    /* ───── SNAPPING ───── */
+    // ─── SNAPPING ───
     _trySnap(piece) {
-        const gid = piece.group;
-        const groupPieces = this.pieces.filter(p => p.group === gid);
+        var gid = piece.group;
+        var groupPieces = [];
+        var i, j;
 
-        // 1) Try snap to board (correct position)
-        for (const gp of groupPieces) {
-            const dx = gp.cx - gp.x;
-            const dy = gp.cy - gp.y;
+        for (i = 0; i < this.pieces.length; i++) {
+            if (this.pieces[i].group === gid) groupPieces.push(this.pieces[i]);
+        }
+
+        // snap to correct position
+        for (i = 0; i < groupPieces.length; i++) {
+            var gp = groupPieces[i];
+            var dx = gp.cx - gp.x;
+            var dy = gp.cy - gp.y;
             if (Math.abs(dx) < this.snapDist && Math.abs(dy) < this.snapDist) {
-                // snap whole group to correct positions
-                for (const gp2 of groupPieces) {
-                    gp2.x = gp2.cx;
-                    gp2.y = gp2.cy;
-                    gp2.placed = true;
+                for (j = 0; j < groupPieces.length; j++) {
+                    groupPieces[j].x = groupPieces[j].cx;
+                    groupPieces[j].y = groupPieces[j].cy;
+                    groupPieces[j].placed = true;
                 }
                 this._checkComplete();
                 return;
             }
         }
 
-        // 2) Try snap to neighbor pieces/groups
-        for (const gp of groupPieces) {
-            const neighbors = this._neighborIds(gp);
-            for (const nid of neighbors) {
-                const nb = this.pieces.find(p => p.id === nid);
+        // snap to neighbors
+        for (i = 0; i < groupPieces.length; i++) {
+            var gp = groupPieces[i];
+            var neighbors = this._neighborIds(gp);
+
+            for (j = 0; j < neighbors.length; j++) {
+                var nb = this._findPiece(neighbors[j]);
                 if (!nb || nb.group === gid) continue;
 
-                const expDx = (nb.c - gp.c) * this.pw;
-                const expDy = (nb.r - gp.r) * this.ph;
-                const actDx = nb.x - gp.x;
-                const actDy = nb.y - gp.y;
+                var expDx = (nb.c - gp.c) * this.pw;
+                var expDy = (nb.r - gp.r) * this.ph;
+                var actDx = nb.x - gp.x;
+                var actDy = nb.y - gp.y;
 
                 if (Math.abs(actDx - expDx) < this.snapDist && Math.abs(actDy - expDy) < this.snapDist) {
                     this._merge(gid, nb.group, gp, nb);
@@ -511,8 +568,15 @@ class PuzzleGame {
         }
     }
 
+    _findPiece(id) {
+        for (var i = 0; i < this.pieces.length; i++) {
+            if (this.pieces[i].id === id) return this.pieces[i];
+        }
+        return null;
+    }
+
     _neighborIds(p) {
-        const ids = [];
+        var ids = [];
         if (p.r > 0) ids.push((p.r - 1) * this.cols + p.c);
         if (p.r < this.rows - 1) ids.push((p.r + 1) * this.cols + p.c);
         if (p.c > 0) ids.push(p.r * this.cols + (p.c - 1));
@@ -521,12 +585,12 @@ class PuzzleGame {
     }
 
     _merge(gidA, gidB, pieceA, neighborB) {
-        // align A group to B group
-        const shiftX = (neighborB.x - (neighborB.c - pieceA.c) * this.pw) - pieceA.x;
-        const shiftY = (neighborB.y - (neighborB.r - pieceA.r) * this.ph) - pieceA.y;
+        var shiftX = (neighborB.x - (neighborB.c - pieceA.c) * this.pw) - pieceA.x;
+        var shiftY = (neighborB.y - (neighborB.r - pieceA.r) * this.ph) - pieceA.y;
+        var isPlaced = neighborB.placed;
 
-        const isPlaced = neighborB.placed;
-        for (const p of this.pieces) {
+        for (var i = 0; i < this.pieces.length; i++) {
+            var p = this.pieces[i];
             if (p.group === gidA) {
                 p.x += shiftX;
                 p.y += shiftY;
@@ -539,39 +603,59 @@ class PuzzleGame {
             }
         }
 
-        // if any piece in merged group is placed, place all
-        if (this.pieces.some(p => p.group === gidB && p.placed)) {
-            for (const p of this.pieces) {
-                if (p.group === gidB) {
-                    p.x = p.cx;
-                    p.y = p.cy;
-                    p.placed = true;
+        // if any in merged group is placed, place all
+        var anyPlaced = false;
+        for (var i = 0; i < this.pieces.length; i++) {
+            if (this.pieces[i].group === gidB && this.pieces[i].placed) {
+                anyPlaced = true;
+                break;
+            }
+        }
+        if (anyPlaced) {
+            for (var i = 0; i < this.pieces.length; i++) {
+                if (this.pieces[i].group === gidB) {
+                    this.pieces[i].x = this.pieces[i].cx;
+                    this.pieces[i].y = this.pieces[i].cy;
+                    this.pieces[i].placed = true;
                 }
             }
         }
 
-        // chain-merge: find other neighbors that now align
         this._chainMerge(gidB);
     }
 
     _chainMerge(gid) {
-        let found = true;
+        var found = true;
         while (found) {
             found = false;
-            const groupPieces = this.pieces.filter(p => p.group === gid);
-            for (const gp of groupPieces) {
-                for (const nid of this._neighborIds(gp)) {
-                    const nb = this.pieces.find(p => p.id === nid);
+            var groupPieces = [];
+            for (var i = 0; i < this.pieces.length; i++) {
+                if (this.pieces[i].group === gid) groupPieces.push(this.pieces[i]);
+            }
+
+            for (var i = 0; i < groupPieces.length; i++) {
+                var gp = groupPieces[i];
+                var nids = this._neighborIds(gp);
+
+                for (var j = 0; j < nids.length; j++) {
+                    var nb = this._findPiece(nids[j]);
                     if (!nb || nb.group === gid) continue;
-                    const dx = Math.abs(nb.x - gp.x - (nb.c - gp.c) * this.pw);
-                    const dy = Math.abs(nb.y - gp.y - (nb.r - gp.r) * this.ph);
+
+                    var dx = Math.abs(nb.x - gp.x - (nb.c - gp.c) * this.pw);
+                    var dy = Math.abs(nb.y - gp.y - (nb.r - gp.r) * this.ph);
+
                     if (dx < 2 && dy < 2) {
-                        const oldGid = nb.group;
-                        const isPlaced = gp.placed || nb.placed;
-                        for (const p of this.pieces) {
-                            if (p.group === oldGid) {
-                                p.group = gid;
-                                if (isPlaced) { p.x = p.cx; p.y = p.cy; p.placed = true; }
+                        var oldGid = nb.group;
+                        var isPlaced = gp.placed || nb.placed;
+
+                        for (var k = 0; k < this.pieces.length; k++) {
+                            if (this.pieces[k].group === oldGid) {
+                                this.pieces[k].group = gid;
+                                if (isPlaced) {
+                                    this.pieces[k].x = this.pieces[k].cx;
+                                    this.pieces[k].y = this.pieces[k].cy;
+                                    this.pieces[k].placed = true;
+                                }
                             }
                         }
                         found = true;
@@ -582,60 +666,83 @@ class PuzzleGame {
     }
 
     _checkComplete() {
-        const placed = this.pieces.filter(p => p.placed).length;
-        if (placed === this.pieces.length && !this.completed) {
+        var placedCount = 0;
+        for (var i = 0; i < this.pieces.length; i++) {
+            if (this.pieces[i].placed) placedCount++;
+        }
+
+        if (placedCount === this.pieces.length && !this.completed) {
             this.completed = true;
             clearInterval(this.timerInterval);
             Storage.deleteSave(this.puzzleId);
+            var self = this;
             if (this.onComplete) {
-                setTimeout(() => {
-                    this.onComplete(this._fmtTime(this.elapsed), this.pieces.length);
+                setTimeout(function () {
+                    self.onComplete(self._fmtTime(self.elapsed), self.pieces.length);
                 }, 600);
             }
         }
     }
 
-    /* ───── UI ───── */
+    // ─── UI ───
     _updateUI() {
-        const placed = this.pieces.filter(p => p.placed).length;
-        const total = this.pieces.length;
-        const pct = Math.round((placed / total) * 100);
+        var placed = 0;
+        for (var i = 0; i < this.pieces.length; i++) {
+            if (this.pieces[i].placed) placed++;
+        }
+        var total = this.pieces.length;
+        var pct = Math.round((placed / total) * 100);
 
-        const el1 = document.getElementById('pieces-info');
-        const el2 = document.getElementById('progress-fill');
-        const el3 = document.getElementById('progress-text');
-        if (el1) el1.textContent = `${placed}/${total}`;
+        var el1 = document.getElementById('pieces-info');
+        var el2 = document.getElementById('progress-fill');
+        var el3 = document.getElementById('progress-text');
+        if (el1) el1.textContent = placed + '/' + total;
         if (el2) el2.style.width = pct + '%';
         if (el3) el3.textContent = pct + '%';
     }
 
     _startTimer() {
         if (this.timerInterval) clearInterval(this.timerInterval);
-        this.timerInterval = setInterval(() => {
-            if (!this.completed) {
-                this.elapsed = Date.now() - this.startTime;
-                const el = document.getElementById('timer');
-                if (el) el.textContent = this._fmtTime(this.elapsed);
+        var self = this;
+        this.timerInterval = setInterval(function () {
+            if (!self.completed) {
+                self.elapsed = Date.now() - self.startTime;
+                var el = document.getElementById('timer');
+                if (el) el.textContent = self._fmtTime(self.elapsed);
             }
         }, 500);
     }
 
     _fmtTime(ms) {
-        const s = Math.floor(ms / 1000);
-        const m = Math.floor(s / 60);
-        const h = Math.floor(m / 60);
-        if (h > 0) return `${h}:${(m % 60).toString().padStart(2, '0')}:${(s % 60).toString().padStart(2, '0')}`;
-        return `${m.toString().padStart(2, '0')}:${(s % 60).toString().padStart(2, '0')}`;
+        var s = Math.floor(ms / 1000);
+        var m = Math.floor(s / 60);
+        var h = Math.floor(m / 60);
+        if (h > 0) {
+            return h + ':' + (m % 60 < 10 ? '0' : '') + (m % 60) + ':' + (s % 60 < 10 ? '0' : '') + (s % 60);
+        }
+        return (m < 10 ? '0' : '') + m + ':' + (s % 60 < 10 ? '0' : '') + (s % 60);
     }
 
-    /* ───── SAVE / RESTORE ───── */
+    // ─── SAVE ───
     _autoSave() {
         if (this.completed) return;
-        const placed = this.pieces.filter(p => p.placed).length;
-        const pct = Math.round((placed / this.pieces.length) * 100);
+        var placed = 0;
+        for (var i = 0; i < this.pieces.length; i++) {
+            if (this.pieces[i].placed) placed++;
+        }
+        var pct = Math.round((placed / this.pieces.length) * 100);
+
+        var piecesData = [];
+        for (var i = 0; i < this.pieces.length; i++) {
+            var p = this.pieces[i];
+            piecesData.push({
+                id: p.id, x: p.x, y: p.y,
+                group: p.group, placed: p.placed
+            });
+        }
 
         Storage.savePuzzle(this.puzzleId, {
-            pieces: this.pieces.map(p => ({ id: p.id, x: p.x, y: p.y, group: p.group, placed: p.placed })),
+            pieces: piecesData,
             edgesH: this.edgesH,
             edgesV: this.edgesV,
             cols: this.cols,
@@ -658,7 +765,10 @@ class PuzzleGame {
         this.elapsed = saved.elapsed || 0;
         this.startTime = Date.now() - this.elapsed;
         if (saved.scale) this.scale = saved.scale;
-        if (saved.panX !== undefined) { this.panX = saved.panX; this.panY = saved.panY; }
+        if (saved.panX !== undefined) {
+            this.panX = saved.panX;
+            this.panY = saved.panY;
+        }
 
         this.totalPieces = this.cols * this.rows;
         this.pw = this.imgW / this.cols;
@@ -666,11 +776,11 @@ class PuzzleGame {
         this.tab = Math.min(this.pw, this.ph) * 0.2;
         this.snapDist = Math.min(this.pw, this.ph) * 0.3;
 
-        this._generate(); // rebuild piece tab info from edges
+        this._generate();
 
-        // restore positions
-        for (const sp of saved.pieces) {
-            const p = this.pieces.find(pp => pp.id === sp.id);
+        for (var i = 0; i < saved.pieces.length; i++) {
+            var sp = saved.pieces[i];
+            var p = this._findPiece(sp.id);
             if (p) {
                 p.x = sp.x;
                 p.y = sp.y;
@@ -680,7 +790,7 @@ class PuzzleGame {
         }
     }
 
-    /* ───── CONTROLS ───── */
+    // ─── CONTROLS ───
     zoomIn() { this.scale = Math.min(5, this.scale * 1.3); }
     zoomOut() { this.scale = Math.max(0.1, this.scale * 0.7); }
     resetZoom() { this._centerView(); }
