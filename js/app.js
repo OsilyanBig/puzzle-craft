@@ -252,4 +252,176 @@ function renderSavedGames() {
 
             card.innerHTML = `
                 <div class="card-image">
-                    <img src="${puzzle.image}" alt="${puzzle.title}" 
+                    <img src="${puzzle.image}" alt="${puzzle.title}" loading="lazy" crossorigin="anonymous">
+                    <div class="card-overlay">
+                        <div class="play-btn-overlay">
+                            <i class="fas fa-play"></i>
+                        </div>
+                    </div>
+                    <span class="piece-badge p${puzzle.pieces <= 100 ? 100 : puzzle.pieces <= 250 ? 250 : puzzle.pieces <= 500 ? 500 : 1000}">${puzzle.pieces} Parça</span>
+                </div>
+                <div class="card-body">
+                    <div class="card-title">${puzzle.title}</div>
+                    <div class="card-meta">
+                        <div class="card-pieces">
+                            <i class="fas fa-puzzle-piece"></i>
+                            <span>${save.placedCount || 0}/${save.totalPieces || puzzle.pieces}</span>
+                        </div>
+                        <button class="card-action">
+                            <i class="fas fa-play"></i> Devam Et
+                        </button>
+                    </div>
+                    <div class="card-progress-bar">
+                        <div class="card-progress-fill" style="width:${progress}%"></div>
+                    </div>
+                    <div class="card-saved-info">
+                        <span>%${progress} tamamlandı</span>
+                        <span>${getTimeAgo(save.lastPlayed)}</span>
+                    </div>
+                </div>
+            `;
+            grid.appendChild(card);
+        });
+}
+
+// ========== START PUZZLE ==========
+async function startPuzzle(puzzleId) {
+    const puzzle = PUZZLES.find(p => p.id === puzzleId);
+    if (!puzzle) return;
+
+    showGame();
+
+    const canvas = document.getElementById('puzzle-canvas');
+    const previewImg = document.getElementById('preview-image');
+    previewImg.src = puzzle.image;
+
+    // Destroy previous game
+    if (currentGame) {
+        currentGame.destroy();
+    }
+
+    // Reset UI
+    document.getElementById('pieces-info').textContent = `0/${puzzle.pieces}`;
+    document.getElementById('timer').textContent = '00:00';
+    document.getElementById('progress-fill').style.width = '0%';
+    document.getElementById('progress-text').textContent = '0%';
+    document.getElementById('complete-modal').classList.add('hidden');
+
+    // Check saved state
+    const savedState = Storage.getSave(puzzleId);
+
+    currentGame = new PuzzleGame(canvas, puzzle.image, puzzle.pieces, puzzleId);
+
+    currentGame.onProgress = (pct) => {
+        // Already handled in _updateProgress
+    };
+
+    currentGame.onComplete = (time, pieces) => {
+        document.getElementById('complete-time').textContent = time;
+        document.getElementById('complete-pieces').textContent = pieces;
+        document.getElementById('complete-message').textContent =
+            `${puzzle.title} puzzle'ını ${time} sürede tamamladınız!`;
+        document.getElementById('complete-modal').classList.remove('hidden');
+        createConfetti();
+    };
+
+    try {
+        await currentGame.init(savedState);
+    } catch (err) {
+        console.error('Puzzle yüklenemedi:', err);
+        alert('Puzzle resmi yüklenemedi. Lütfen tekrar deneyin.');
+        exitGame();
+    }
+}
+
+function exitGame() {
+    if (currentGame) {
+        currentGame._autoSave();
+        currentGame.destroy();
+        currentGame = null;
+    }
+    showHome();
+    renderPuzzleGrid();
+}
+
+function replayPuzzle() {
+    if (!currentGame) return;
+    const puzzleId = currentGame.puzzleId;
+    Storage.deleteSave(puzzleId);
+    document.getElementById('complete-modal').classList.add('hidden');
+    startPuzzle(puzzleId);
+}
+
+// ========== GAME CONTROLS ==========
+function togglePreview() {
+    document.getElementById('preview-overlay').classList.toggle('hidden');
+}
+
+function toggleEdgeMode() {
+    if (!currentGame) return;
+    const active = currentGame.toggleEdges();
+    document.getElementById('edge-btn').classList.toggle('active', active);
+}
+
+function zoomIn() {
+    if (currentGame) currentGame.zoomIn();
+}
+
+function zoomOut() {
+    if (currentGame) currentGame.zoomOut();
+}
+
+function resetZoom() {
+    if (currentGame) currentGame.resetZoom();
+}
+
+// ========== CONFETTI ==========
+function createConfetti() {
+    const container = document.getElementById('confetti');
+    container.innerHTML = '';
+    const colors = ['#6c5ce7', '#a29bfe', '#fd79a8', '#00cec9', '#fdcb6e', '#e17055'];
+
+    for (let i = 0; i < 60; i++) {
+        const conf = document.createElement('div');
+        conf.style.cssText = `
+            position: absolute;
+            width: ${Math.random() * 10 + 5}px;
+            height: ${Math.random() * 10 + 5}px;
+            background: ${colors[Math.floor(Math.random() * colors.length)]};
+            left: ${Math.random() * 100}%;
+            top: -20px;
+            border-radius: ${Math.random() > 0.5 ? '50%' : '2px'};
+            animation: confettiFall ${Math.random() * 2 + 2}s ease-in forwards;
+            animation-delay: ${Math.random() * 0.5}s;
+            opacity: 0.8;
+        `;
+        container.appendChild(conf);
+    }
+
+    // Add confetti animation
+    if (!document.getElementById('confetti-style')) {
+        const style = document.createElement('style');
+        style.id = 'confetti-style';
+        style.textContent = `
+            @keyframes confettiFall {
+                0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+                100% { transform: translateY(500px) rotate(720deg); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+    }
+}
+
+// ========== UTILITIES ==========
+function getTimeAgo(timestamp) {
+    if (!timestamp) return '';
+    const diff = Date.now() - timestamp;
+    const minutes = Math.floor(diff / 60000);
+    const hours = Math.floor(diff / 3600000);
+    const days = Math.floor(diff / 86400000);
+
+    if (minutes < 1) return 'Az önce';
+    if (minutes < 60) return `${minutes} dk önce`;
+    if (hours < 24) return `${hours} saat önce`;
+    return `${days} gün önce`;
+}
