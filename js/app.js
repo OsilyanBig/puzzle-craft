@@ -1,11 +1,11 @@
 var PUZZLES = [
-    { id: 'landscape-painting', title: 'Manzara Resmi', image: './images/landscape-painting.jpg', pieces: 1000, difficulty: 4 },
-    { id: 'natural-drawing', title: 'Doğal Çizim', image: './images/natural-drawing.jpg', pieces: 100, difficulty: 1 },
-    { id: 'japanese-forest', title: 'Japon Ormanı', image: './images/japanese-forest.jpg', pieces: 500, difficulty: 3 },
-    { id: 'digital-art', title: 'Dijital Sanat', image: './images/digital-art.jpg', pieces: 250, difficulty: 2 },
-    { id: 'color-drawing', title: 'Renkli Çizim', image: './images/color-drawing.jpg', pieces: 1000, difficulty: 4 },
-    { id: 'foggy-scenery', title: 'Sisli Manzara', image: './images/foggy-scenery.jpg', pieces: 500, difficulty: 3 },
-    { id: 'abstract-landscape', title: 'Soyut Manzara', image: './images/abstract-landscape.jpg', pieces: 1000, difficulty: 4 }
+    { id: 'landscape-painting', title: 'Manzara Resmi', image: './images/landscape-painting-nature-drawing.jpg', pieces: 1000, difficulty: 4 },
+    { id: 'natural-drawing', title: 'Doğal Çizim', image: './images/natural-drawing-nature-drawing.jpg', pieces: 100, difficulty: 1 },
+    { id: 'japanese-forest', title: 'Japon Ormanı', image: './images/japanese-landscape-painting-forest-painting.jpg', pieces: 500, difficulty: 3 },
+    { id: 'digital-art', title: 'Dijital Sanat', image: './images/art-artwork-illustration-drawing-hd-wallpaper-preview.jpg', pieces: 250, difficulty: 2 },
+    { id: 'color-drawing', title: 'Renkli Çizim', image: './images/drawing-wallpaper-preview.jpg', pieces: 1000, difficulty: 4 },
+    { id: 'foggy-scenery', title: 'Sisli Manzara', image: './images/foggy-scenery-3840x2160-14972.jpg', pieces: 500, difficulty: 3 },
+    { id: 'abstract-landscape', title: 'Soyut Manzara', image: './images/landscape-painting-abstract-landscape-real-painting.jpg', pieces: 1000, difficulty: 4 }
 ];
 
 var currentGame = null;
