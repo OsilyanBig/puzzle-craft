@@ -127,26 +127,78 @@ class PuzzleGame {
     }
 
     _scatter() {
-        var spread = Math.max(this.imgW, this.imgH) * 1.5;
+        var puzzleAreaW = this.imgW;
+        var puzzleAreaH = this.imgH;
+    
+    // Parçaları puzzle alanının etrafına dağıt (çok uzağa değil)
         for (var i = 0; i < this.pieces.length; i++) {
             var p = this.pieces[i];
-            p.x = -spread / 2 + Math.random() * spread * 2;
-            p.y = -spread / 4 + Math.random() * spread * 1.5;
+        
+        // Puzzle alanının sağına ve altına dağıt
+            var side = Math.floor(Math.random() * 4); // 0=üst, 1=sağ, 2=alt, 3=sol
+        
+            if (side === 0) {
+            // üst
+                p.x = Math.random() * puzzleAreaW;
+                p.y = -this.ph * 2 - Math.random() * puzzleAreaH * 0.5;
+            } else if (side === 1) {
+            // sağ
+                p.x = puzzleAreaW + this.pw + Math.random() * puzzleAreaW * 0.5;
+                p.y = Math.random() * puzzleAreaH;
+            } else if (side === 2) {
+            // alt
+                p.x = Math.random() * puzzleAreaW;
+                p.y = puzzleAreaH + this.ph + Math.random() * puzzleAreaH * 0.5;
+            } else {
+            // sol
+                p.x = -this.pw * 2 - Math.random() * puzzleAreaW * 0.5;
+                p.y = Math.random() * puzzleAreaH;
+            }
+        
             p.placed = false;
             p.group = p.id;
         }
     }
 
+
     _centerView() {
         var area = document.getElementById('game-area');
         if (!area) return;
-        this.scale = Math.min(
-            area.clientWidth / (this.imgW * 1.5),
-            area.clientHeight / (this.imgH * 1.5),
-            1
-        );
-        this.panX = area.clientWidth / 2 - (this.imgW / 2) * this.scale;
-        this.panY = area.clientHeight / 2 - (this.imgH / 2) * this.scale;
+    
+    // Tüm parçaları kapsayan alanı hesapla
+        var minX = Infinity, minY = Infinity;
+        var maxX = -Infinity, maxY = -Infinity;
+    
+        for (var i = 0; i < this.pieces.length; i++) {
+            var p = this.pieces[i];
+            if (p.x < minX) minX = p.x;
+            if (p.y < minY) minY = p.y;
+            if (p.x + this.pw > maxX) maxX = p.x + this.pw;
+            if (p.y + this.ph > maxY) maxY = p.y + this.ph;
+        }
+    
+    // Puzzle hedef alanını da dahil et
+        if (0 < minX) minX = 0;
+        if (0 < minY) minY = 0;
+        if (this.imgW > maxX) maxX = this.imgW;
+        if (this.imgH > maxY) maxY = this.imgH;
+    
+        var contentW = maxX - minX;
+        var contentH = maxY - minY;
+    
+    // Ekrana sığacak şekilde zoom ayarla
+        var padding = 50;
+        var availW = area.clientWidth - padding * 2;
+        var availH = area.clientHeight - padding * 2;
+    
+        this.scale = Math.min(availW / contentW, availH / contentH, 1);
+    
+    // Ortala
+        var centerX = (minX + maxX) / 2;
+        var centerY = (minY + maxY) / 2;
+    
+        this.panX = area.clientWidth / 2 - centerX * this.scale;
+        this.panY = area.clientHeight / 2 - centerY * this.scale;
     }
 
     // ─── RENDER ───
