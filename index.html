@@ -59,7 +59,7 @@
         </div>
         <div class="hero-content">
             <div class="hero-badge">
-                <i class="fas fa-sparkles"></i> Yeni Nesil Puzzle Deneyimi
+                <i class="fas fa-star"></i> Yeni Nesil Puzzle Deneyimi
             </div>
             <h1>Parçaları Birleştir,<br><span class="gradient-text">Sanatı Keşfet</span></h1>
             <p>100'den 1000 parçaya kadar zorlu puzzlelar. İlerlemenizi kaydedin, kaldığınız yerden devam edin.</p>
@@ -89,7 +89,7 @@
         <div class="announce-container">
             <div class="announce-card offline">
                 <div class="announce-icon">
-                    <i class="fas fa-wifi-slash"></i>
+                    <i class="fas fa-wifi"></i>
                 </div>
                 <div class="announce-info">
                     <h3>Çevrimdışı Mod</h3>
@@ -123,9 +123,7 @@
                 <button class="filter-btn" onclick="filterPuzzles(1000)">1000 Parça</button>
             </div>
         </div>
-        <div class="puzzle-grid" id="puzzle-grid">
-            <!-- JS ile doldurulacak -->
-        </div>
+        <div class="puzzle-grid" id="puzzle-grid"></div>
     </section>
 
     <!-- SAVED GAMES PAGE -->
@@ -134,9 +132,7 @@
             <h2><i class="fas fa-save"></i> Kayıtlı Oyunlar</h2>
             <p>Kaldığın yerden devam et</p>
         </div>
-        <div class="saved-grid" id="saved-grid">
-            <!-- JS ile doldurulacak -->
-        </div>
+        <div class="saved-grid" id="saved-grid"></div>
         <div class="no-saves hidden" id="no-saves">
             <i class="fas fa-box-open"></i>
             <h3>Henüz kayıtlı oyun yok</h3>
@@ -175,13 +171,13 @@
                 <button class="tool-btn" onclick="toggleEdgeMode()" title="Kenar Parçaları" id="edge-btn">
                     <i class="fas fa-border-all"></i>
                 </button>
-                <button class="tool-btn" onclick="zoomIn()" title="Yakınlaştır">
+                <button class="tool-btn" onclick="doZoomIn()" title="Yakınlaştır">
                     <i class="fas fa-search-plus"></i>
                 </button>
-                <button class="tool-btn" onclick="zoomOut()" title="Uzaklaştır">
+                <button class="tool-btn" onclick="doZoomOut()" title="Uzaklaştır">
                     <i class="fas fa-search-minus"></i>
                 </button>
-                <button class="tool-btn" onclick="resetZoom()" title="Sıfırla">
+                <button class="tool-btn" onclick="doResetZoom()" title="Sıfırla">
                     <i class="fas fa-compress"></i>
                 </button>
             </div>
