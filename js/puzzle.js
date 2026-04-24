@@ -739,11 +739,17 @@ class PuzzleGame {
     // ─── UI ───
     _updateUI() {
         var placed = 0;
+        var total = this.pieces.length;
+
+        if (total === 0) {
+            total = this.totalPieces || 0;
+        }
+
         for (var i = 0; i < this.pieces.length; i++) {
             if (this.pieces[i].placed) placed++;
         }
-        var total = this.pieces.length;
-        var pct = Math.round((placed / total) * 100);
+
+        var pct = total > 0 ? Math.round((placed / total) * 100) : 0;
 
         var el1 = document.getElementById('pieces-info');
         var el2 = document.getElementById('progress-fill');
@@ -752,7 +758,7 @@ class PuzzleGame {
         if (el2) el2.style.width = pct + '%';
         if (el3) el3.textContent = pct + '%';
     }
-
+ 
     _startTimer() {
         if (this.timerInterval) clearInterval(this.timerInterval);
         var self = this;
