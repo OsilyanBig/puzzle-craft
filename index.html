@@ -62,7 +62,7 @@
                 <i class="fas fa-star"></i> Yeni Nesil Puzzle Deneyimi
             </div>
             <h1>Parçaları Birleştir,<br><span class="gradient-text">Sanatı Keşfet</span></h1>
-            <p>100'den 1000 parçaya kadar zorlu puzzlelar. İlerlemenizi kaydedin, kaldığınız yerden devam edin.</p>
+            <p>50'den 250 parçaya kadar zorlu puzzlelar. İlerlemenizi kaydedin, kaldığınız yerden devam edin.</p>
             <div class="hero-stats">
                 <div class="stat">
                     <span class="stat-number">7</span>
@@ -107,6 +107,16 @@
                 </div>
                 <span class="announce-badge">Yakında</span>
             </div>
+            <div class="announce-card multiplayer" style="grid-column: 1 / -1;">
+                <div class="announce-icon" style="background:rgba(214,48,49,0.15);color:#d63031;">
+                    <i class="fas fa-fire"></i>
+                </div>
+                <div class="announce-info">
+                    <h3>1000 Parça Modu</h3>
+                    <p>Ultra zorluk! 1000 parçalık devasa puzzlelar yakında geliyor.</p>
+                </div>
+                <span class="announce-badge">Yakında</span>
+            </div>
         </div>
     </section>
 
@@ -117,10 +127,9 @@
             <p>Bir puzzle seç ve maceraya başla</p>
             <div class="filter-bar">
                 <button class="filter-btn active" onclick="filterPuzzles('all')">Tümü</button>
+                <button class="filter-btn" onclick="filterPuzzles(50)">50 Parça</button>
                 <button class="filter-btn" onclick="filterPuzzles(100)">100 Parça</button>
                 <button class="filter-btn" onclick="filterPuzzles(250)">250 Parça</button>
-                <button class="filter-btn" onclick="filterPuzzles(500)">500 Parça</button>
-                <button class="filter-btn" onclick="filterPuzzles(1000)">1000 Parça</button>
             </div>
         </div>
         <div class="puzzle-grid" id="puzzle-grid"></div>
