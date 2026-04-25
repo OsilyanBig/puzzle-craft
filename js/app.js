@@ -1,11 +1,41 @@
+// ── Eski bozuk kayıtları temizle ──
+(function() {
+    try {
+        var saves = JSON.parse(localStorage.getItem('puzzlecraft_saves')) || {};
+        var dominated = false;
+        var keys = Object.keys(saves);
+        for (var i = 0; i < keys.length; i++) {
+            var s = saves[keys[i]];
+            // eski yapıdaki save'leri tespit et
+            if (s && s.pieces && s.pieces.length > 0) {
+                var first = s.pieces[0];
+                // yeni yapıda r,c,cx,cy olmalı - yoksa eski save
+                if (first && (first.r === undefined || first.cx === undefined)) {
+                    delete saves[keys[i]];
+                    dominated = true;
+                }
+            }
+            // edgesH yoksa da eski
+            if (s && !s.edgesH) {
+                delete saves[keys[i]];
+                dominated = true;
+            }
+        }
+        if (dominated) {
+            localStorage.setItem('puzzlecraft_saves', JSON.stringify(saves));
+            console.log('Eski bozuk kayıtlar temizlendi');
+        }
+    } catch(e) {}
+})();
+
 var PUZZLES = [
-    { id: 'landscape-painting', title: 'Manzara Resmi', image: './images/landscape-painting-nature-drawing.jpg', pieces: 1000, difficulty: 4 },
-    { id: 'natural-drawing', title: 'Doğal Çizim', image: './images/natural-drawing-nature-drawing.jpg', pieces: 100, difficulty: 1 },
-    { id: 'japanese-forest', title: 'Japon Ormanı', image: './images/japanese-landscape-painting-forest-painting.jpg', pieces: 500, difficulty: 3 },
-    { id: 'digital-art', title: 'Dijital Sanat', image: './images/art-artwork-illustration-drawing-hd-wallpaper-preview.jpg', pieces: 250, difficulty: 2 },
-    { id: 'color-drawing', title: 'Renkli Çizim', image: './images/drawing-wallpaper-preview.jpg', pieces: 1000, difficulty: 4 },
-    { id: 'foggy-scenery', title: 'Sisli Manzara', image: './images/foggy-scenery-3840x2160-14972.jpg', pieces: 500, difficulty: 3 },
-    { id: 'abstract-landscape', title: 'Soyut Manzara', image: './images/landscape-painting-abstract-landscape-real-painting.jpg', pieces: 1000, difficulty: 4 }
+    { id: 'landscape-painting', title: 'Manzara Resmi', image: './images/landscape-painting-nature-drawing.jpg', pieces: 250, difficulty: 3 },
+    { id: 'natural-drawing', title: 'Doğal Çizim', image: './images/natural-drawing-nature-drawing.jpg', pieces: 50, difficulty: 1 },
+    { id: 'japanese-forest', title: 'Japon Ormanı', image: './images/japanese-landscape-painting-forest-painting.jpg', pieces: 100, difficulty: 2 },
+    { id: 'digital-art', title: 'Dijital Sanat', image: './images/art-artwork-illustration-drawing-hd-wallpaper-preview.jpg', pieces: 100, difficulty: 2 },
+    { id: 'color-drawing', title: 'Renkli Çizim', image: './images/drawing-wallpaper-preview.jpg', pieces: 250, difficulty: 3 },
+    { id: 'foggy-scenery', title: 'Sisli Manzara', image: './images/foggy-scenery-3840x2160-14972.jpg', pieces: 250, difficulty: 3 },
+    { id: 'abstract-landscape', title: 'Soyut Manzara', image: './images/landscape-painting-abstract-landscape-real-painting.jpg', pieces: 50, difficulty: 1 }
 ];
 
 var currentGame = null;
@@ -112,10 +142,10 @@ function renderPuzzleGrid() {
         var save = Storage.getSave(puzzle.id);
         var progress = save ? (save.progress || 0) : 0;
 
-        var badgeClass = 'p1000';
-        if (puzzle.pieces <= 100) badgeClass = 'p100';
+        var badgeClass = 'p250';
+        if (puzzle.pieces <= 50) badgeClass = 'p50';
+        else if (puzzle.pieces <= 100) badgeClass = 'p100';
         else if (puzzle.pieces <= 250) badgeClass = 'p250';
-        else if (puzzle.pieces <= 500) badgeClass = 'p500';
 
         var dots = '';
         for (var d = 0; d < 4; d++) {
@@ -189,7 +219,6 @@ function renderSavedGames() {
     noEl.classList.add('hidden');
     grid.innerHTML = '';
 
-    // sort by last played
     keys.sort(function (a, b) {
         return (saves[b].lastPlayed || 0) - (saves[a].lastPlayed || 0);
     });
@@ -205,10 +234,9 @@ function renderSavedGames() {
         if (!puzzle) continue;
 
         var progress = save.progress || 0;
-        var badgeClass = 'p1000';
-        if (puzzle.pieces <= 100) badgeClass = 'p100';
-        else if (puzzle.pieces <= 250) badgeClass = 'p250';
-        else if (puzzle.pieces <= 500) badgeClass = 'p500';
+        var badgeClass = 'p250';
+        if (puzzle.pieces <= 50) badgeClass = 'p50';
+        else if (puzzle.pieces <= 100) badgeClass = 'p100';
 
         var card = document.createElement('div');
         card.className = 'puzzle-card';
@@ -274,7 +302,6 @@ function startPuzzle(puzzleId) {
     };
 
     currentGame.load(saved).then(function () {
-        // Puzzle yüklendi, UI'ı güncelle
         currentGame._updateUI();
     }).catch(function (err) {
         console.error(err);
@@ -282,6 +309,7 @@ function startPuzzle(puzzleId) {
         exitGame();
     });
 }
+
 function exitGame() {
     if (currentGame) {
         currentGame._autoSave();
