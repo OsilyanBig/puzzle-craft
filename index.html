@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PuzzleCraft - Puzzle Oyunu</title>
+    <meta name="description" content="Online puzzle oyunu. 50, 100, 250 parçalık puzzleları çöz, ilerlemenizi kaydedin, arkadaşlarınızla paylaşın.">
     <link rel="stylesheet" href="css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -14,10 +15,10 @@
     <div id="loading-screen" class="loading-screen">
         <div class="loader-content">
             <div class="puzzle-loader">
-                <div class="loader-piece p1"></div>
-                <div class="loader-piece p2"></div>
-                <div class="loader-piece p3"></div>
-                <div class="loader-piece p4"></div>
+                <div class="loader-piece lp1"></div>
+                <div class="loader-piece lp2"></div>
+                <div class="loader-piece lp3"></div>
+                <div class="loader-piece lp4"></div>
             </div>
             <h2>PuzzleCraft</h2>
             <p>Yükleniyor...</p>
@@ -36,14 +37,38 @@
                     <i class="fas fa-home"></i> Ana Sayfa
                 </a>
                 <a href="#" onclick="showSaved()" class="nav-link" data-page="saved">
-                    <i class="fas fa-save"></i> Kayıtlı Oyunlar
+                    <i class="fas fa-save"></i> Kayıtlı
+                </a>
+                <a href="#" onclick="showCompleted()" class="nav-link" data-page="completed">
+                    <i class="fas fa-trophy"></i> Bitirilen
+                </a>
+                <a href="#" onclick="showStats()" class="nav-link" data-page="stats">
+                    <i class="fas fa-chart-bar"></i> İstatistik
                 </a>
             </div>
             <div class="nav-actions">
                 <button class="theme-toggle" onclick="toggleTheme()">
                     <i class="fas fa-moon"></i>
                 </button>
+                <button class="mobile-menu-btn" onclick="toggleMobileMenu()">
+                    <i class="fas fa-bars"></i>
+                </button>
             </div>
+        </div>
+        <!-- Mobile Menu -->
+        <div class="mobile-menu hidden" id="mobile-menu">
+            <a href="#" onclick="showHome();closeMobileMenu()" class="mobile-link" data-page="home">
+                <i class="fas fa-home"></i> Ana Sayfa
+            </a>
+            <a href="#" onclick="showSaved();closeMobileMenu()" class="mobile-link" data-page="saved">
+                <i class="fas fa-save"></i> Kayıtlı Oyunlar
+            </a>
+            <a href="#" onclick="showCompleted();closeMobileMenu()" class="mobile-link" data-page="completed">
+                <i class="fas fa-trophy"></i> Bitirilen Oyunlar
+            </a>
+            <a href="#" onclick="showStats();closeMobileMenu()" class="mobile-link" data-page="stats">
+                <i class="fas fa-chart-bar"></i> İstatistikler
+            </a>
         </div>
     </nav>
 
@@ -63,15 +88,15 @@
                 <i class="fas fa-star"></i> Yeni Nesil Puzzle Deneyimi
             </div>
             <h1>Parçaları Birleştir,<br><span class="gradient-text">Sanatı Keşfet</span></h1>
-            <p>50'den 250 parçaya kadar zorlu puzzlelar. İlerlemenizi kaydedin, kaldığınız yerden devam edin.</p>
+            <p>50'den 250 parçaya kadar zorlu puzzlelar. İlerlemenizi kaydedin, rekorlarınızı kırın, arkadaşlarınızla paylaşın.</p>
             <div class="hero-stats">
                 <div class="stat">
-                    <span class="stat-number">7</span>
+                    <span class="stat-number" id="hero-total-puzzles">7</span>
                     <span class="stat-label">Puzzle</span>
                 </div>
                 <div class="stat">
-                    <span class="stat-number">4</span>
-                    <span class="stat-label">Zorluk</span>
+                    <span class="stat-number" id="hero-completed-count">0</span>
+                    <span class="stat-label">Çözülen</span>
                 </div>
                 <div class="stat">
                     <span class="stat-number">∞</span>
@@ -85,13 +110,11 @@
         </div>
     </section>
 
-    <!-- COMING SOON BANNER -->
+    <!-- ANNOUNCEMENTS -->
     <section class="announcements">
         <div class="announce-container">
             <div class="announce-card offline">
-                <div class="announce-icon">
-                    <i class="fas fa-wifi"></i>
-                </div>
+                <div class="announce-icon"><i class="fas fa-wifi"></i></div>
                 <div class="announce-info">
                     <h3>Çevrimdışı Mod</h3>
                     <p>Yakında internet olmadan da puzzle çözebileceksiniz!</p>
@@ -99,27 +122,31 @@
                 <span class="announce-badge">Yakında</span>
             </div>
             <div class="announce-card multiplayer">
-                <div class="announce-icon">
-                    <i class="fas fa-users"></i>
-                </div>
+                <div class="announce-icon"><i class="fas fa-users"></i></div>
                 <div class="announce-info">
                     <h3>Multiplayer</h3>
                     <p>Arkadaşlarınızla birlikte puzzle çözün, yarışın!</p>
                 </div>
                 <span class="announce-badge">Yakında</span>
             </div>
-            <div class="announce-card multiplayer" style="grid-column: 1 / -1;">
-                <div class="announce-icon" style="background:rgba(214,48,49,0.15);color:#d63031;">
-                    <i class="fas fa-fire"></i>
-                </div>
+            <div class="announce-card fire">
+                <div class="announce-icon"><i class="fas fa-fire"></i></div>
                 <div class="announce-info">
                     <h3>1000 Parça Modu</h3>
-                    <p>Ultra zorluk! 1000 parçalık devasa puzzlelar yakında geliyor.</p>
+                    <p>Ultra zorluk! 1000 parçalık devasa puzzlelar yakında.</p>
                 </div>
                 <span class="announce-badge">Yakında</span>
             </div>
         </div>
     </section>
+
+    <!-- AD BANNER 1 -->
+    <div class="ad-container" id="ad-top">
+        <div class="ad-placeholder">
+            <i class="fas fa-ad"></i>
+            <span>Reklam Alanı</span>
+        </div>
+    </div>
 
     <!-- PUZZLE GALLERY -->
     <section class="gallery-section" id="puzzles">
@@ -151,6 +178,86 @@
         </div>
     </section>
 
+    <!-- COMPLETED GAMES PAGE -->
+    <section class="completed-section hidden" id="completed-section">
+        <div class="section-header">
+            <h2><i class="fas fa-trophy"></i> Bitirilen Oyunlar</h2>
+            <p>Başarılarınız ve rekorlarınız</p>
+        </div>
+        <div class="completed-grid" id="completed-grid"></div>
+        <div class="no-completed hidden" id="no-completed">
+            <i class="fas fa-medal"></i>
+            <h3>Henüz tamamlanan puzzle yok</h3>
+            <p>İlk puzzle'ını tamamla ve burada gör!</p>
+            <button onclick="showHome()" class="btn-primary">Puzzle Seç</button>
+        </div>
+    </section>
+
+    <!-- STATS PAGE -->
+    <section class="stats-section hidden" id="stats-section">
+        <div class="section-header">
+            <h2><i class="fas fa-chart-bar"></i> İstatistikler</h2>
+            <p>Puzzle yolculuğunuzun özeti</p>
+        </div>
+        <div class="stats-grid" id="stats-grid">
+            <div class="stat-card">
+                <div class="stat-card-icon"><i class="fas fa-puzzle-piece"></i></div>
+                <div class="stat-card-value" id="stat-total-solved">0</div>
+                <div class="stat-card-label">Çözülen Puzzle</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-card-icon"><i class="fas fa-clock"></i></div>
+                <div class="stat-card-value" id="stat-total-time">00:00</div>
+                <div class="stat-card-label">Toplam Süre</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-card-icon"><i class="fas fa-bolt"></i></div>
+                <div class="stat-card-value" id="stat-best-time">--:--</div>
+                <div class="stat-card-label">En Hızlı Çözüm</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-card-icon"><i class="fas fa-fire"></i></div>
+                <div class="stat-card-value" id="stat-total-pieces">0</div>
+                <div class="stat-card-label">Toplam Parça</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-card-icon"><i class="fas fa-star"></i></div>
+                <div class="stat-card-value" id="stat-avg-time">--:--</div>
+                <div class="stat-card-label">Ortalama Süre</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-card-icon"><i class="fas fa-lightbulb"></i></div>
+                <div class="stat-card-value" id="stat-hints-used">0</div>
+                <div class="stat-card-label">İpucu Kullanılan</div>
+            </div>
+        </div>
+        <div class="stats-history">
+            <h3>Son Çözümler</h3>
+            <div class="history-list" id="history-list"></div>
+        </div>
+    </section>
+
+    <!-- COMPLETED PUZZLE VIEWER -->
+    <div class="viewer-modal hidden" id="viewer-modal">
+        <div class="viewer-content">
+            <button class="viewer-close" onclick="closeViewer()"><i class="fas fa-times"></i></button>
+            <img id="viewer-image" src="" alt="">
+            <div class="viewer-info">
+                <h3 id="viewer-title"></h3>
+                <div class="viewer-stats">
+                    <span><i class="fas fa-puzzle-piece"></i> <span id="viewer-pieces"></span> parça</span>
+                    <span><i class="fas fa-clock"></i> <span id="viewer-time"></span></span>
+                    <span><i class="fas fa-trophy"></i> Rekor: <span id="viewer-record"></span></span>
+                </div>
+                <div class="viewer-actions">
+                    <button class="btn-primary" onclick="replayFromViewer()"><i class="fas fa-redo"></i> Tekrar Oyna</button>
+                    <button class="btn-secondary" onclick="shareCompleted()"><i class="fas fa-share-alt"></i> Paylaş</button>
+                    <button class="btn-secondary" onclick="downloadCompleted()"><i class="fas fa-download"></i> İndir</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- PUZZLE GAME SCREEN -->
     <section class="game-section hidden" id="game-section">
         <div class="game-toolbar">
@@ -175,6 +282,10 @@
                 </div>
             </div>
             <div class="tool-actions">
+                <button class="tool-btn hint-btn" onclick="useHint()" title="İpucu" id="hint-btn">
+                    <i class="fas fa-lightbulb"></i>
+                    <span class="hint-count" id="hint-count">3</span>
+                </button>
                 <button class="tool-btn" onclick="togglePreview()" title="Önizleme">
                     <i class="fas fa-image"></i>
                 </button>
@@ -193,12 +304,10 @@
             </div>
         </div>
 
-        <!-- Preview Overlay -->
         <div class="preview-overlay hidden" id="preview-overlay" onclick="togglePreview()">
             <img id="preview-image" src="" alt="Preview">
         </div>
 
-        <!-- Game Canvas Area -->
         <div class="game-area" id="game-area">
             <canvas id="puzzle-canvas"></canvas>
         </div>
@@ -209,7 +318,10 @@
                 <div class="confetti-container" id="confetti"></div>
                 <i class="fas fa-trophy trophy-icon"></i>
                 <h2>Tebrikler! 🎉</h2>
-                <p id="complete-message">Puzzle'ı tamamladınız!</p>
+                <p id="complete-message"></p>
+                <div class="record-badge hidden" id="record-badge">
+                    <i class="fas fa-crown"></i> Yeni Rekor!
+                </div>
                 <div class="complete-stats">
                     <div class="c-stat">
                         <i class="fas fa-clock"></i>
@@ -221,10 +333,16 @@
                         <span id="complete-pieces">0</span>
                         <small>Parça</small>
                     </div>
+                    <div class="c-stat">
+                        <i class="fas fa-lightbulb"></i>
+                        <span id="complete-hints">0</span>
+                        <small>İpucu</small>
+                    </div>
                 </div>
                 <div class="modal-actions">
                     <button onclick="exitGame()" class="btn-secondary">Ana Sayfa</button>
-                    <button onclick="replayPuzzle()" class="btn-primary">Tekrar Oyna</button>
+                    <button onclick="shareFromComplete()" class="btn-secondary"><i class="fas fa-share-alt"></i> Paylaş</button>
+                    <button onclick="replayPuzzle()" class="btn-primary"><i class="fas fa-redo"></i> Tekrar Oyna</button>
                 </div>
             </div>
         </div>
@@ -244,7 +362,22 @@
                 <span><i class="fas fa-check"></i> Otomatik Kayıt</span>
             </div>
         </div>
+        <!-- AD BANNER FOOTER -->
+        <div class="ad-container" id="ad-footer">
+            <div class="ad-placeholder">
+                <i class="fas fa-ad"></i>
+                <span>Reklam Alanı</span>
+            </div>
+        </div>
     </footer>
+
+    <!-- AUDIO (preload) -->
+    <audio id="snd-snap" preload="auto">
+        <source src="data:audio/wav;base64,UklGRlQBAABXQVZFZm10IBAAAAABAAEAESsAABErAAABAAgAZGF0YTABAACAfoB+gH+AgYKEhoeIiImKiYiHhYOBf358enh3dnZ2d3h5e32AgYOFh4iJiYmIh4WDgX99e3l4d3Z2dnd4eXt9gIGDhYeIiYmJiIeFg4F/fXt5eHd2dnZ3eHl7fYCBg4WHiImJiYiHhYOBf317eXh3dnV2d3h5e32AgYOFh4iJiYmIh4WDgX99e3l4d3Z2dnd4eXt9gIGDhYeIiYmJiIeFg4F/fXt5eA==" type="audio/wav">
+    </audio>
+    <audio id="snd-complete" preload="auto">
+        <source src="data:audio/wav;base64,UklGRrQCAABXQVZFZm10IBAAAAABAAEAESsAABErAAABAAgAZGF0YZACAACAiZKXmZeRiH57fYSNlpyem5SMgXl1dn2Gj5idnpqTiX95dXd+h5CYnZ6akox/d3N1fIWOl5yenJWNgnt3eH6Hj5ednZmSiIB5dnh+hY2Wm52blI2DfHh5f4aPl5ydm5WOhH15eX6Gj5ecnZuVjoR8eXl+ho+XnJ2blY6EfHl5foaPl5ydm5WNg3x4eH6Gj5ednZuVjYN8eHh+ho+XnZ2blY2DfHh4foaPl52dm5WNg3x4eH6Gj5ednZuUjIN7eHh+ho+XnZ2blI2De3h4foaPl52dm5SNg3t4eH6Gj5ednZuUjYN7eHh+ho+XnZ2blI2De3h4foaPl52dm5SNg3t4eH6Gj5ednZuUjYN7eHh+hpCYnZ2blI2De3l5foaPl5ydm5WNg3x5eX6Gj5ecnZuVjYN8eXl+ho+XnJ2blY2EfHl5foaPl5ydm5WOhH15eX6Gj5ecnZuVjoR9eXl/ho+XnJ2blY6EfXl5f4aPl5ydm5WOhH15en+Gj5ecnZuVjoR9enp/ho+XnJ2blY6EfXp6f4aPl5ydm5WOhH16en+Gj5ecnZuVjoR9enp/ho+XnJ2blY6FfXp6f4aPl5yem5aOhX16en+Gj5ecnpuWjoV9enp/h4+XnJ6blY6FfXp6f4ePl5yem5aOhX16en+Hj5ecnpuWjoV9enp/h4+XnJ6blY6FfXp6f4eQmJyem5aOhX56en+HkJicnpuWjoV+enp/h5CYnJ6blo6Ffnp6f4eQmJyem5aOhX56en+HkJicnpuWjoV+enp/h5CYnJ6blo6Ffnp7f4eQmJyem5aPhX56e3+HkJicnpuWj4V+ent/h5CYnJ6blo+Ffnp7f4eQmJyem5aPhX56e3+HkA==" type="audio/wav">
+    </audio>
 
     <script src="js/storage.js"></script>
     <script src="js/puzzle.js"></script>
