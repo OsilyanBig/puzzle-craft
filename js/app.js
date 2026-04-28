@@ -1,16 +1,98 @@
+// ── Eski save temizliği ──
+(function() {
+    try {
+        localStorage.removeItem('puzzlecraft_saves');
+        var saves = JSON.parse(localStorage.getItem('puzzlecraft_saves_v2')) || {};
+        var keys = Object.keys(saves);
+        for (var i = 0; i < keys.length; i++) {
+            var s = saves[keys[i]];
+            if (s && s.pieces && s.pieces.length > 0) {
+                var first = s.pieces[0];
+                if (!first.r && first.r !== 0) { delete saves[keys[i]]; }
+            }
+            if (s && !s.edgesH) { delete saves[keys[i]]; }
+        }
+        localStorage.setItem('puzzlecraft_saves_v2', JSON.stringify(saves));
+    } catch(e) {}
+})();
+
+// ── KATEGORİLER ──
+var CATEGORIES = [
+    { id: 'all', name: 'Tümü', icon: 'fas fa-th', color: '#6c5ce7' },
+    { id: 'landscape', name: 'Manzara', icon: 'fas fa-mountain', color: '#00b894' },
+    { id: 'animals', name: 'Hayvanlar', icon: 'fas fa-paw', color: '#fdcb6e' },
+    { id: 'art', name: 'Sanat', icon: 'fas fa-palette', color: '#e17055' },
+    { id: 'gaming', name: 'Oyun', icon: 'fas fa-gamepad', color: '#0984e3' },
+    { id: 'cities', name: 'Şehirler', icon: 'fas fa-city', color: '#a29bfe' },
+    { id: 'space', name: 'Uzay', icon: 'fas fa-rocket', color: '#2d3436' },
+    { id: 'flowers', name: 'Çiçekler', icon: 'fas fa-seedling', color: '#55efc4' },
+    { id: 'foods', name: 'Yemek', icon: 'fas fa-utensils', color: '#fd79a8' }
+];
+
+// ── PUZZLELAR ──
 var PUZZLES = [
-    { id: 'landscape-painting', title: 'Manzara Resmi', image: './images/landscape-painting-nature-drawing.jpg', pieces: 250, difficulty: 3 },
-    { id: 'natural-drawing', title: 'Doğal Çizim', image: './images/natural-drawing-nature-drawing.jpg', pieces: 50, difficulty: 1 },
-    { id: 'japanese-forest', title: 'Japon Ormanı', image: './images/japanese-landscape-painting-forest-painting.jpg', pieces: 100, difficulty: 2 },
-    { id: 'digital-art', title: 'Dijital Sanat', image: './images/art-artwork-illustration-drawing-hd-wallpaper-preview.jpg', pieces: 100, difficulty: 2 },
-    { id: 'color-drawing', title: 'Renkli Çizim', image: './images/drawing-wallpaper-preview.jpg', pieces: 250, difficulty: 3 },
-    { id: 'foggy-scenery', title: 'Sisli Manzara', image: './images/foggy-scenery-3840x2160-14972.jpg', pieces: 250, difficulty: 3 },
-    { id: 'abstract-landscape', title: 'Soyut Manzara', image: './images/landscape-painting-abstract-landscape-real-painting.jpg', pieces: 50, difficulty: 1 }
+    // ─── LANDSCAPE (8) ───
+    { id: 'landscape-1', title: 'Manzara 1', image: './images/landscape/landscape-1.jpg', pieces: 250, difficulty: 3, category: 'landscape' },
+    { id: 'landscape-2', title: 'Manzara 2', image: './images/landscape/landscape-2.jpg', pieces: 100, difficulty: 2, category: 'landscape' },
+    { id: 'landscape-3', title: 'Manzara 3', image: './images/landscape/landscape-3.jpg', pieces: 50, difficulty: 1, category: 'landscape' },
+    { id: 'landscape-4', title: 'Manzara 4', image: './images/landscape/landscape-4.jpg', pieces: 250, difficulty: 3, category: 'landscape' },
+    { id: 'landscape-5', title: 'Manzara 5', image: './images/landscape/landscape-5.jpg', pieces: 100, difficulty: 2, category: 'landscape' },
+    { id: 'landscape-6', title: 'Manzara 6', image: './images/landscape/landscape-6.jpg', pieces: 50, difficulty: 1, category: 'landscape' },
+    { id: 'landscape-7', title: 'Manzara 7', image: './images/landscape/landscape-7.jpg', pieces: 250, difficulty: 3, category: 'landscape' },
+    { id: 'landscape-8', title: 'Manzara 8', image: './images/landscape/landscape-8.jpg', pieces: 100, difficulty: 2, category: 'landscape' },
+
+    // ─── ANIMALS (4) ───
+    { id: 'animals-1', title: 'Hayvan 1', image: './images/animals/animals-1.jpg', pieces: 100, difficulty: 2, category: 'animals' },
+    { id: 'animals-2', title: 'Hayvan 2', image: './images/animals/animals-2.jpg', pieces: 50, difficulty: 1, category: 'animals' },
+    { id: 'animals-3', title: 'Hayvan 3', image: './images/animals/animals-3.jpg', pieces: 250, difficulty: 3, category: 'animals' },
+    { id: 'animals-4', title: 'Hayvan 4', image: './images/animals/animals-4.jpg', pieces: 100, difficulty: 2, category: 'animals' },
+
+    // ─── ART (4) ───
+    { id: 'art-1', title: 'Sanat 1', image: './images/art/art-1.jpg', pieces: 250, difficulty: 3, category: 'art' },
+    { id: 'art-2', title: 'Sanat 2', image: './images/art/art-2.jpg', pieces: 100, difficulty: 2, category: 'art' },
+    { id: 'art-3', title: 'Sanat 3', image: './images/art/art-3.jpg', pieces: 50, difficulty: 1, category: 'art' },
+    { id: 'art-4', title: 'Sanat 4', image: './images/art/art-4.jpg', pieces: 250, difficulty: 3, category: 'art' },
+
+    // ─── GAMING (2) ───
+    { id: 'gaming-1', title: 'Oyun 1', image: './images/gaming/gaming-1.jpg', pieces: 100, difficulty: 2, category: 'gaming' },
+    { id: 'gaming-2', title: 'Oyun 2', image: './images/gaming/gaming-2.jpg', pieces: 250, difficulty: 3, category: 'gaming' },
+
+    // ─── CITIES (7) ───
+    { id: 'cities-1', title: 'Şehir 1', image: './images/cities/cities-1.jpg', pieces: 250, difficulty: 3, category: 'cities' },
+    { id: 'cities-2', title: 'Şehir 2', image: './images/cities/cities-2.jpg', pieces: 100, difficulty: 2, category: 'cities' },
+    { id: 'cities-3', title: 'Şehir 3', image: './images/cities/cities-3.jpg', pieces: 50, difficulty: 1, category: 'cities' },
+    { id: 'cities-4', title: 'Şehir 4', image: './images/cities/cities-4.jpg', pieces: 250, difficulty: 3, category: 'cities' },
+    { id: 'cities-5', title: 'Şehir 5', image: './images/cities/cities-5.jpg', pieces: 100, difficulty: 2, category: 'cities' },
+    { id: 'cities-6', title: 'Şehir 6', image: './images/cities/cities-6.jpg', pieces: 50, difficulty: 1, category: 'cities' },
+    { id: 'cities-7', title: 'Şehir 7', image: './images/cities/cities-7.jpg', pieces: 250, difficulty: 3, category: 'cities' },
+
+    // ─── SPACE (6) ───
+    { id: 'space-1', title: 'Uzay 1', image: './images/space/space-1.jpg', pieces: 250, difficulty: 3, category: 'space' },
+    { id: 'space-2', title: 'Uzay 2', image: './images/space/space-2.jpg', pieces: 100, difficulty: 2, category: 'space' },
+    { id: 'space-3', title: 'Uzay 3', image: './images/space/space-3.jpg', pieces: 50, difficulty: 1, category: 'space' },
+    { id: 'space-4', title: 'Uzay 4', image: './images/space/space-4.jpg', pieces: 250, difficulty: 3, category: 'space' },
+    { id: 'space-5', title: 'Uzay 5', image: './images/space/space-5.jpg', pieces: 100, difficulty: 2, category: 'space' },
+    { id: 'space-6', title: 'Uzay 6', image: './images/space/space-6.jpg', pieces: 50, difficulty: 1, category: 'space' },
+
+    // ─── FLOWERS (5) ───
+    { id: 'flowers-1', title: 'Çiçek 1', image: './images/flowers/flowers-1.jpg', pieces: 100, difficulty: 2, category: 'flowers' },
+    { id: 'flowers-2', title: 'Çiçek 2', image: './images/flowers/flowers-2.jpg', pieces: 50, difficulty: 1, category: 'flowers' },
+    { id: 'flowers-3', title: 'Çiçek 3', image: './images/flowers/flowers-3.jpg', pieces: 250, difficulty: 3, category: 'flowers' },
+    { id: 'flowers-4', title: 'Çiçek 4', image: './images/flowers/flowers-4.jpg', pieces: 100, difficulty: 2, category: 'flowers' },
+    { id: 'flowers-5', title: 'Çiçek 5', image: './images/flowers/flowers-5.jpg', pieces: 50, difficulty: 1, category: 'flowers' },
+
+    // ─── FOODS (5) ───
+    { id: 'foods-1', title: 'Yemek 1', image: './images/foods/foods-1.jpg', pieces: 100, difficulty: 2, category: 'foods' },
+    { id: 'foods-2', title: 'Yemek 2', image: './images/foods/foods-2.jpg', pieces: 50, difficulty: 1, category: 'foods' },
+    { id: 'foods-3', title: 'Yemek 3', image: './images/foods/foods-3.jpg', pieces: 250, difficulty: 3, category: 'foods' },
+    { id: 'foods-4', title: 'Yemek 4', image: './images/foods/foods-4.jpg', pieces: 100, difficulty: 2, category: 'foods' },
+    { id: 'foods-5', title: 'Yemek 5', image: './images/foods/foods-5.jpg', pieces: 50, difficulty: 1, category: 'foods' }
 ];
 
 var currentGame = null;
 var currentPuzzleId = null;
-var currentFilter = 'all';
+var currentCategory = 'all';
+var currentPieceFilter = 'all';
 
 // ── INIT ──
 document.addEventListener('DOMContentLoaded', function () {
@@ -21,6 +103,7 @@ document.addEventListener('DOMContentLoaded', function () {
     var theme = localStorage.getItem('puzzlecraft_theme') || 'dark';
     document.documentElement.setAttribute('data-theme', theme);
     updateThemeIcon(theme);
+    renderCategoryTabs();
     renderPuzzleGrid();
     updateHeroStats();
 });
@@ -39,12 +122,8 @@ function updateThemeIcon(t) {
 }
 
 // ── MOBILE MENU ──
-function toggleMobileMenu() {
-    document.getElementById('mobile-menu').classList.toggle('hidden');
-}
-function closeMobileMenu() {
-    document.getElementById('mobile-menu').classList.add('hidden');
-}
+function toggleMobileMenu() { document.getElementById('mobile-menu').classList.toggle('hidden'); }
+function closeMobileMenu() { document.getElementById('mobile-menu').classList.add('hidden'); }
 
 // ── NAV ──
 function hideAllSections() {
@@ -68,9 +147,9 @@ function showHome() {
     if (adTop) adTop.classList.remove('hidden');
     document.getElementById('footer').classList.remove('hidden');
     document.getElementById('navbar').classList.remove('hidden');
-    setActiveNav('home');
-    document.body.style.overflow = '';
+    setActiveNav('home'); document.body.style.overflow = '';
     updateHeroStats();
+    updateCategoryBackground('all');
 }
 
 function showSaved() {
@@ -78,8 +157,7 @@ function showSaved() {
     document.getElementById('saved-section').classList.remove('hidden');
     document.getElementById('footer').classList.remove('hidden');
     document.getElementById('navbar').classList.remove('hidden');
-    setActiveNav('saved');
-    document.body.style.overflow = '';
+    setActiveNav('saved'); document.body.style.overflow = '';
     renderSavedGames();
 }
 
@@ -88,8 +166,7 @@ function showCompleted() {
     document.getElementById('completed-section').classList.remove('hidden');
     document.getElementById('footer').classList.remove('hidden');
     document.getElementById('navbar').classList.remove('hidden');
-    setActiveNav('completed');
-    document.body.style.overflow = '';
+    setActiveNav('completed'); document.body.style.overflow = '';
     renderCompletedGames();
 }
 
@@ -98,8 +175,7 @@ function showStats() {
     document.getElementById('stats-section').classList.remove('hidden');
     document.getElementById('footer').classList.remove('hidden');
     document.getElementById('navbar').classList.remove('hidden');
-    setActiveNav('stats');
-    document.body.style.overflow = '';
+    setActiveNav('stats'); document.body.style.overflow = '';
     renderStats();
 }
 
@@ -122,12 +198,62 @@ function scrollToPuzzles() { document.getElementById('puzzles').scrollIntoView({
 
 function updateHeroStats() {
     var completed = Storage.getAllCompleted();
-    var count = Object.keys(completed).length;
     var el = document.getElementById('hero-completed-count');
-    if (el) el.textContent = count;
+    if (el) el.textContent = Object.keys(completed).length;
+    var el2 = document.getElementById('hero-total-puzzles');
+    if (el2) el2.textContent = PUZZLES.length;
 }
 
-// ── DIFFICULTY STARS ──
+// ── KATEGORİ ARKAPLAN ──
+function updateCategoryBackground(catId) {
+    var hero = document.getElementById('hero-section');
+    if (!hero) return;
+    hero.className = 'hero';
+    if (catId !== 'all') {
+        hero.classList.add('hero-cat-' + catId);
+    }
+}
+
+// ── KATEGORİ TABLARI ──
+function renderCategoryTabs() {
+    var container = document.getElementById('category-tabs');
+    if (!container) return;
+    container.innerHTML = '';
+
+    for (var i = 0; i < CATEGORIES.length; i++) {
+        var cat = CATEGORIES[i];
+        var count = cat.id === 'all' ? PUZZLES.length : countCategory(cat.id);
+        var tab = document.createElement('button');
+        tab.className = 'cat-tab' + (cat.id === currentCategory ? ' active' : '');
+        tab.setAttribute('data-cat', cat.id);
+        tab.style.setProperty('--cat-color', cat.color);
+        tab.innerHTML = '<i class="' + cat.icon + '"></i><span>' + cat.name + '</span><span class="cat-count">' + count + '</span>';
+        (function(id) {
+            tab.addEventListener('click', function() { selectCategory(id); });
+        })(cat.id);
+        container.appendChild(tab);
+    }
+}
+
+function countCategory(catId) {
+    var c = 0;
+    for (var i = 0; i < PUZZLES.length; i++) {
+        if (PUZZLES[i].category === catId) c++;
+    }
+    return c;
+}
+
+function selectCategory(catId) {
+    currentCategory = catId;
+    var tabs = document.querySelectorAll('.cat-tab');
+    for (var i = 0; i < tabs.length; i++) {
+        tabs[i].classList.toggle('active', tabs[i].getAttribute('data-cat') === catId);
+    }
+    updateCategoryBackground(catId);
+    renderPuzzleGrid();
+}
+
+// ── STARS ──
 function getStars(difficulty) {
     var html = '';
     for (var i = 0; i < 3; i++) {
@@ -136,13 +262,34 @@ function getStars(difficulty) {
     return html;
 }
 
+// ── PARÇA FİLTRE ──
+function filterPieces(f) {
+    currentPieceFilter = f;
+    var btns = document.querySelectorAll('.filter-btn');
+    for (var i = 0; i < btns.length; i++) {
+        var txt = btns[i].textContent.trim();
+        var val = txt === 'Tümü' ? 'all' : parseInt(txt);
+        btns[i].classList.toggle('active', val === f);
+    }
+    renderPuzzleGrid();
+}
+
 // ── PUZZLE GRID ──
 function renderPuzzleGrid() {
     var grid = document.getElementById('puzzle-grid');
     grid.innerHTML = '';
+
     var list = [];
     for (var i = 0; i < PUZZLES.length; i++) {
-        if (currentFilter === 'all' || PUZZLES[i].pieces === currentFilter) list.push(PUZZLES[i]);
+        var p = PUZZLES[i];
+        var catMatch = currentCategory === 'all' || p.category === currentCategory;
+        var pieceMatch = currentPieceFilter === 'all' || p.pieces === currentPieceFilter;
+        if (catMatch && pieceMatch) list.push(p);
+    }
+
+    if (list.length === 0) {
+        grid.innerHTML = '<div class="empty-grid"><i class="fas fa-search"></i><p>Bu filtrelere uygun puzzle bulunamadı</p></div>';
+        return;
     }
 
     for (var i = 0; i < list.length; i++) {
@@ -155,13 +302,13 @@ function renderPuzzleGrid() {
 
         var badgeClass = puzzle.pieces <= 50 ? 'p50' : puzzle.pieces <= 100 ? 'p100' : 'p250';
         var stars = getStars(puzzle.difficulty);
+        var catObj = findCategory(puzzle.category);
+        var catColor = catObj ? catObj.color : '#6c5ce7';
 
         var statusHTML = '';
         if (isCompleted) {
             statusHTML = '<div class="card-completed-badge"><i class="fas fa-check-circle"></i> Tamamlandı</div>';
-            if (completedData) {
-                statusHTML += '<div class="card-record">Rekor: ' + completedData.bestTime + '</div>';
-            }
+            if (completedData) statusHTML += '<div class="card-record">Rekor: ' + completedData.bestTime + '</div>';
         } else if (hasSave) {
             statusHTML = '<div class="card-progress-bar"><div class="card-progress-fill" style="width:' + progress + '%"></div></div>';
             statusHTML += '<div class="card-saved-info"><span>%' + progress + '</span><span>' + timeAgo(save.lastPlayed) + '</span></div>';
@@ -171,11 +318,13 @@ function renderPuzzleGrid() {
 
         var card = document.createElement('div');
         card.className = 'puzzle-card' + (isCompleted ? ' completed' : '');
+        card.style.setProperty('--card-accent', catColor);
         card.innerHTML =
             '<div class="card-image">' +
                 '<img src="' + puzzle.image + '" alt="' + puzzle.title + '" loading="lazy">' +
                 '<div class="card-overlay"><div class="play-btn-overlay"><i class="fas fa-play"></i></div></div>' +
                 '<span class="piece-badge ' + badgeClass + '">' + puzzle.pieces + ' Parça</span>' +
+                '<span class="cat-badge" style="background:' + catColor + '"><i class="' + (catObj ? catObj.icon : '') + '"></i></span>' +
                 (isCompleted ? '<div class="completed-ribbon"><i class="fas fa-trophy"></i></div>' : '') +
             '</div>' +
             '<div class="card-body">' +
@@ -190,8 +339,8 @@ function renderPuzzleGrid() {
         (function (pid) { card.addEventListener('click', function () { startPuzzle(pid); }); })(puzzle.id);
         grid.appendChild(card);
 
-        // Her 3 karttan sonra reklam placeholder
-        if ((i + 1) % 3 === 0 && i < list.length - 1) {
+        // Her 4 karttan sonra reklam
+        if ((i + 1) % 4 === 0 && i < list.length - 1) {
             var adCard = document.createElement('div');
             adCard.className = 'ad-card';
             adCard.innerHTML = '<div class="ad-placeholder"><i class="fas fa-ad"></i><span>Reklam</span></div>';
@@ -200,15 +349,11 @@ function renderPuzzleGrid() {
     }
 }
 
-function filterPuzzles(f) {
-    currentFilter = f;
-    var btns = document.querySelectorAll('.filter-btn');
-    for (var i = 0; i < btns.length; i++) {
-        var txt = btns[i].textContent.trim();
-        var val = txt === 'Tümü' ? 'all' : parseInt(txt);
-        btns[i].classList.toggle('active', val === f);
+function findCategory(catId) {
+    for (var i = 0; i < CATEGORIES.length; i++) {
+        if (CATEGORIES[i].id === catId) return CATEGORIES[i];
     }
-    renderPuzzleGrid();
+    return null;
 }
 
 // ── SAVED GAMES ──
@@ -262,10 +407,10 @@ function renderCompletedGames() {
         var card = document.createElement('div');
         card.className = 'puzzle-card completed';
         card.innerHTML =
-            '<div class="card-image"><img src="' + puzzle.image + '" alt="' + puzzle.title + '" loading="lazy"><div class="card-overlay"><div class="play-btn-overlay"><i class="fas fa-eye"></i></div></div><span class="piece-badge p-done">✓ Tamamlandı</span><div class="completed-ribbon"><i class="fas fa-trophy"></i></div></div>' +
+            '<div class="card-image"><img src="' + puzzle.image + '" alt="' + puzzle.title + '" loading="lazy"><div class="card-overlay"><div class="play-btn-overlay"><i class="fas fa-eye"></i></div></div><span class="piece-badge p-done">✓</span><div class="completed-ribbon"><i class="fas fa-trophy"></i></div></div>' +
             '<div class="card-body"><div class="card-title">' + puzzle.title + '</div>' +
-            '<div class="completed-info"><div class="ci"><i class="fas fa-trophy"></i> Rekor: ' + data.bestTime + '</div><div class="ci"><i class="fas fa-clock"></i> Son: ' + data.lastTime + '</div><div class="ci"><i class="fas fa-redo"></i> ' + (data.timesCompleted || 1) + 'x oynandı</div></div>' +
-            '<div class="card-meta"><button class="card-action" onclick="event.stopPropagation();openViewer(\'' + pid + '\')"><i class="fas fa-eye"></i> Görüntüle</button><button class="card-action" onclick="event.stopPropagation();startPuzzle(\'' + pid + '\')"><i class="fas fa-redo"></i> Tekrar</button></div></div>';
+            '<div class="completed-info"><div class="ci"><i class="fas fa-trophy"></i> ' + data.bestTime + '</div><div class="ci"><i class="fas fa-redo"></i> ' + (data.timesCompleted || 1) + 'x</div></div>' +
+            '<div class="card-meta"><button class="card-action" onclick="event.stopPropagation();openViewer(\'' + pid + '\')"><i class="fas fa-eye"></i> Gör</button><button class="card-action" onclick="event.stopPropagation();startPuzzle(\'' + pid + '\')"><i class="fas fa-redo"></i> Tekrar</button></div></div>';
 
         (function (id) { card.addEventListener('click', function () { openViewer(id); }); })(pid);
         grid.appendChild(card);
@@ -279,7 +424,6 @@ function openViewer(pid) {
     var puzzle = findPuzzle(pid);
     var data = Storage.getCompleted(pid);
     if (!puzzle || !data) return;
-
     document.getElementById('viewer-image').src = puzzle.image;
     document.getElementById('viewer-title').textContent = puzzle.title;
     document.getElementById('viewer-pieces').textContent = data.pieces || puzzle.pieces;
@@ -287,76 +431,55 @@ function openViewer(pid) {
     document.getElementById('viewer-record').textContent = data.bestTime;
     document.getElementById('viewer-modal').classList.remove('hidden');
 }
-
 function closeViewer() { document.getElementById('viewer-modal').classList.add('hidden'); viewerPuzzleId = null; }
-
 function replayFromViewer() { if (viewerPuzzleId) { closeViewer(); startPuzzle(viewerPuzzleId); } }
 
 function shareCompleted() {
     if (!viewerPuzzleId) return;
     var puzzle = findPuzzle(viewerPuzzleId);
     var data = Storage.getCompleted(viewerPuzzleId);
-    if (!puzzle || !data) return;
-    doShare(puzzle, data);
+    if (puzzle && data) doShare(puzzle, data);
 }
-
 function downloadCompleted() {
     if (!viewerPuzzleId) return;
     var puzzle = findPuzzle(viewerPuzzleId);
     if (!puzzle) return;
-    var link = document.createElement('a');
-    link.href = puzzle.image;
-    link.download = puzzle.title + '.jpg';
-    link.click();
+    var a = document.createElement('a'); a.href = puzzle.image; a.download = puzzle.title + '.jpg'; a.click();
 }
-
 function shareFromComplete() {
     if (!currentPuzzleId) return;
     var puzzle = findPuzzle(currentPuzzleId);
     var data = Storage.getCompleted(currentPuzzleId);
     if (puzzle && data) doShare(puzzle, data);
 }
-
 function doShare(puzzle, data) {
     var text = '🧩 PuzzleCraft\'ta "' + puzzle.title + '" puzzle\'ını ' + data.bestTime + ' sürede tamamladım! ' + puzzle.pieces + ' parça 💪\n\nSen de dene: ' + window.location.origin;
-
     if (navigator.share) {
         navigator.share({ title: 'PuzzleCraft', text: text }).catch(function(){});
+    } else if (navigator.clipboard) {
+        navigator.clipboard.writeText(text).then(function () { alert('Paylaşım metni kopyalandı!'); });
     } else {
-        // Clipboard'a kopyala
-        if (navigator.clipboard) {
-            navigator.clipboard.writeText(text).then(function () {
-                alert('Paylaşım metni kopyalandı!');
-            });
-        } else {
-            prompt('Paylaşım metnini kopyalayın:', text);
-        }
+        prompt('Paylaşım metnini kopyalayın:', text);
     }
 }
 
 // ── STATS ──
 function renderStats() {
     var stats = Storage.getStats();
-    var completed = Storage.getAllCompleted();
-
     document.getElementById('stat-total-solved').textContent = stats.totalSolved;
     document.getElementById('stat-total-time').textContent = fmtTimeMs(stats.totalTimeMs);
     document.getElementById('stat-best-time').textContent = stats.bestTimeMs > 0 ? fmtTimeMs(stats.bestTimeMs) : '--:--';
     document.getElementById('stat-total-pieces').textContent = stats.totalPieces;
     document.getElementById('stat-hints-used').textContent = stats.totalHints;
-
     var avgMs = stats.totalSolved > 0 ? Math.round(stats.totalTimeMs / stats.totalSolved) : 0;
     document.getElementById('stat-avg-time').textContent = avgMs > 0 ? fmtTimeMs(avgMs) : '--:--';
 
-    // History
     var histEl = document.getElementById('history-list');
     histEl.innerHTML = '';
-
     if (!stats.history || stats.history.length === 0) {
         histEl.innerHTML = '<div class="history-empty">Henüz çözüm yok</div>';
         return;
     }
-
     for (var i = 0; i < Math.min(stats.history.length, 20); i++) {
         var h = stats.history[i];
         var div = document.createElement('div');
@@ -374,7 +497,6 @@ function startPuzzle(puzzleId) {
     var puzzle = findPuzzle(puzzleId);
     if (!puzzle) return;
     currentPuzzleId = puzzleId;
-
     showGame();
 
     document.getElementById('preview-image').src = puzzle.image;
@@ -391,21 +513,14 @@ function startPuzzle(puzzleId) {
     var saved = Storage.getSave(puzzleId);
 
     currentGame = new PuzzleGame(canvas, puzzle.image, puzzle.pieces, puzzleId);
-
     currentGame.onComplete = function (timeStr, pieces, timeMs, hintsUsed) {
-        var isRecord = Storage.saveCompleted(puzzleId, {
-            time: timeStr, timeMs: timeMs, pieces: pieces, hintsUsed: hintsUsed
-        });
-
+        var isRecord = Storage.saveCompleted(puzzleId, { time: timeStr, timeMs: timeMs, pieces: pieces, hintsUsed: hintsUsed });
         Storage.addToStats(puzzleId, puzzle.title, timeMs, pieces, hintsUsed);
-
         document.getElementById('complete-time').textContent = timeStr;
         document.getElementById('complete-pieces').textContent = pieces;
         document.getElementById('complete-hints').textContent = hintsUsed;
         document.getElementById('complete-message').textContent = puzzle.title + ' puzzle\'ını ' + timeStr + ' sürede tamamladınız!';
-
-        if (isRecord) { document.getElementById('record-badge').classList.remove('hidden'); }
-
+        if (isRecord) document.getElementById('record-badge').classList.remove('hidden');
         document.getElementById('complete-modal').classList.remove('hidden');
         createConfetti();
     };
@@ -422,8 +537,7 @@ function startPuzzle(puzzleId) {
 function exitGame() {
     if (currentGame) { currentGame._autoSave(); currentGame.destroy(); currentGame = null; }
     currentPuzzleId = null;
-    showHome();
-    renderPuzzleGrid();
+    showHome(); renderPuzzleGrid();
 }
 
 function replayPuzzle() {
@@ -438,16 +552,12 @@ function replayPuzzle() {
 function togglePreview() { document.getElementById('preview-overlay').classList.toggle('hidden'); }
 function toggleEdgeMode() {
     if (!currentGame) return;
-    var a = currentGame.toggleEdges();
-    document.getElementById('edge-btn').classList.toggle('active', a);
+    document.getElementById('edge-btn').classList.toggle('active', currentGame.toggleEdges());
 }
 function doZoomIn() { if (currentGame) currentGame.zoomIn(); }
 function doZoomOut() { if (currentGame) currentGame.zoomOut(); }
 function doResetZoom() { if (currentGame) currentGame.resetZoom(); }
-
-function useHint() {
-    if (currentGame) currentGame.useHint();
-}
+function useHint() { if (currentGame) currentGame.useHint(); }
 
 // ── CONFETTI ──
 function createConfetti() {
@@ -470,16 +580,11 @@ function findPuzzle(id) {
     for (var i = 0; i < PUZZLES.length; i++) { if (PUZZLES[i].id === id) return PUZZLES[i]; }
     return null;
 }
-
 function timeAgo(ts) {
     if (!ts) return '';
     var d = Date.now() - ts, m = Math.floor(d/60000), h = Math.floor(d/3600000), dy = Math.floor(d/86400000);
-    if (m < 1) return 'Az önce';
-    if (m < 60) return m + ' dk önce';
-    if (h < 24) return h + ' saat önce';
-    return dy + ' gün önce';
+    if (m < 1) return 'Az önce'; if (m < 60) return m + ' dk önce'; if (h < 24) return h + ' saat önce'; return dy + ' gün önce';
 }
-
 function fmtTimeMs(ms) {
     if (!ms) return '00:00';
     var s = Math.floor(ms / 1000), m = Math.floor(s / 60), h = Math.floor(m / 60);
