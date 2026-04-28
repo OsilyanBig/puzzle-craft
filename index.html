@@ -152,16 +152,23 @@
     <section class="gallery-section" id="puzzles">
         <div class="section-header">
             <h2>Puzzle Koleksiyonu</h2>
-            <p>Bir puzzle seç ve maceraya başla</p>
-            <div class="filter-bar">
-                <button class="filter-btn active" onclick="filterPuzzles('all')">Tümü</button>
-                <button class="filter-btn" onclick="filterPuzzles(50)">50 Parça</button>
-                <button class="filter-btn" onclick="filterPuzzles(100)">100 Parça</button>
-                <button class="filter-btn" onclick="filterPuzzles(250)">250 Parça</button>
-            </div>
+            <p>Bir kategori seç, parça sayısını belirle ve maceraya başla</p>
         </div>
+
+        <!-- Kategori Tabları -->
+        <div class="category-tabs" id="category-tabs"></div>
+
+        <!-- Parça Filtresi -->
+        <div class="filter-bar">
+            <button class="filter-btn active" onclick="filterPieces('all')">Tümü</button>
+            <button class="filter-btn" onclick="filterPieces(50)">50 Parça</button>
+            <button class="filter-btn" onclick="filterPieces(100)">100 Parça</button>
+            <button class="filter-btn" onclick="filterPieces(250)">250 Parça</button>
+        </div>
+
         <div class="puzzle-grid" id="puzzle-grid"></div>
     </section>
+
 
     <!-- SAVED GAMES PAGE -->
     <section class="saved-section hidden" id="saved-section">
