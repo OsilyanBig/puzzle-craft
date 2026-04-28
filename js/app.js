@@ -33,13 +33,13 @@ var CATEGORIES = [
 var PUZZLES = [
     // ─── LANDSCAPE (8) ───
     { id: 'landscape-1', title: 'Manzara 1', image: './images/landscape/landscape-1.jpg', pieces: 250, difficulty: 3, category: 'landscape' },
-    { id: 'landscape-2', title: 'Manzara 2', image: './images/landscape/landscape-2.jpg', pieces: 100, difficulty: 2, category: 'landscape' },
-    { id: 'landscape-3', title: 'Manzara 3', image: './images/landscape/landscape-3.jpg', pieces: 50, difficulty: 1, category: 'landscape' },
-    { id: 'landscape-4', title: 'Manzara 4', image: './images/landscape/landscape-4.jpg', pieces: 250, difficulty: 3, category: 'landscape' },
-    { id: 'landscape-5', title: 'Manzara 5', image: './images/landscape/landscape-5.jpg', pieces: 100, difficulty: 2, category: 'landscape' },
-    { id: 'landscape-6', title: 'Manzara 6', image: './images/landscape/landscape-6.jpg', pieces: 50, difficulty: 1, category: 'landscape' },
-    { id: 'landscape-7', title: 'Manzara 7', image: './images/landscape/landscape-7.jpg', pieces: 250, difficulty: 3, category: 'landscape' },
-    { id: 'landscape-8', title: 'Manzara 8', image: './images/landscape/landscape-8.jpg', pieces: 100, difficulty: 2, category: 'landscape' },
+    //{ id: 'landscape-2', title: 'Manzara 2', image: './images/landscape/landscape-2.jpg', pieces: 100, difficulty: 2, category: 'landscape' },
+    //{ id: 'landscape-3', title: 'Manzara 3', image: './images/landscape/landscape-3.jpg', pieces: 50, difficulty: 1, category: 'landscape' },
+    //{ id: 'landscape-4', title: 'Manzara 4', image: './images/landscape/landscape-4.jpg', pieces: 250, difficulty: 3, category: 'landscape' },
+    //{ id: 'landscape-5', title: 'Manzara 5', image: './images/landscape/landscape-5.jpg', pieces: 100, difficulty: 2, category: 'landscape' },
+    //{ id: 'landscape-6', title: 'Manzara 6', image: './images/landscape/landscape-6.jpg', pieces: 50, difficulty: 1, category: 'landscape' },
+    //{ id: 'landscape-7', title: 'Manzara 7', image: './images/landscape/landscape-7.jpg', pieces: 250, difficulty: 3, category: 'landscape' },
+    //{ id: 'landscape-8', title: 'Manzara 8', image: './images/landscape/landscape-8.jpg', pieces: 100, difficulty: 2, category: 'landscape' },
 
     // ─── ANIMALS (4) ───
     { id: 'animals-1', title: 'Hayvan 1', image: './images/animals/animals-1.jpg', pieces: 100, difficulty: 2, category: 'animals' },
