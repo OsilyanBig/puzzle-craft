@@ -534,3 +534,144 @@ body {
 @media (max-width: 400px) {
     .stats-grid { grid-template-columns: 1fr; }
 }
+
+
+/* ══════ KATEGORİ TABLARI ══════ */
+.category-tabs {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding: 0 0 20px;
+    margin-bottom: 16px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+}
+.category-tabs::-webkit-scrollbar { display: none; }
+
+.cat-tab {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 50px;
+    color: var(--text-secondary);
+    font-size: 0.88rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: var(--transition);
+    white-space: nowrap;
+    font-family: var(--font);
+    flex-shrink: 0;
+}
+
+.cat-tab:hover {
+    border-color: var(--cat-color, var(--accent));
+    color: var(--text-primary);
+}
+
+.cat-tab.active {
+    background: var(--cat-color, var(--accent));
+    color: white;
+    border-color: transparent;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+.cat-tab i { font-size: 0.85rem; }
+
+.cat-count {
+    background: rgba(255,255,255,0.15);
+    padding: 2px 8px;
+    border-radius: 50px;
+    font-size: 0.72rem;
+    font-weight: 700;
+}
+
+.cat-tab.active .cat-count {
+    background: rgba(255,255,255,0.25);
+}
+
+/* ══════ KATEGORİ BADGE ON CARD ══════ */
+.cat-badge {
+    position: absolute;
+    bottom: 12px;
+    left: 12px;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 0.7rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+/* ══════ CARD ACCENT ══════ */
+.puzzle-card:hover {
+    border-color: var(--card-accent, rgba(108,92,231,0.4));
+}
+
+/* ══════ HERO KATEGORİ ARKAPLAN ══════ */
+.hero-cat-landscape .hero-bg { background: linear-gradient(180deg, rgba(0,184,148,0.12) 0%, rgba(10,10,15,0) 60%); }
+.hero-cat-animals .hero-bg { background: linear-gradient(180deg, rgba(253,203,110,0.12) 0%, rgba(10,10,15,0) 60%); }
+.hero-cat-art .hero-bg { background: linear-gradient(180deg, rgba(225,112,85,0.12) 0%, rgba(10,10,15,0) 60%); }
+.hero-cat-gaming .hero-bg { background: linear-gradient(180deg, rgba(9,132,227,0.12) 0%, rgba(10,10,15,0) 60%); }
+.hero-cat-cities .hero-bg { background: linear-gradient(180deg, rgba(162,155,254,0.12) 0%, rgba(10,10,15,0) 60%); }
+.hero-cat-space .hero-bg { background: linear-gradient(180deg, rgba(45,52,54,0.25) 0%, rgba(10,10,15,0) 60%); }
+.hero-cat-flowers .hero-bg { background: linear-gradient(180deg, rgba(85,239,196,0.12) 0%, rgba(10,10,15,0) 60%); }
+.hero-cat-foods .hero-bg { background: linear-gradient(180deg, rgba(253,121,168,0.12) 0%, rgba(10,10,15,0) 60%); }
+
+[data-theme="light"] .hero-cat-landscape .hero-bg { background: linear-gradient(180deg, rgba(0,184,148,0.08) 0%, transparent 60%); }
+[data-theme="light"] .hero-cat-animals .hero-bg { background: linear-gradient(180deg, rgba(253,203,110,0.08) 0%, transparent 60%); }
+[data-theme="light"] .hero-cat-art .hero-bg { background: linear-gradient(180deg, rgba(225,112,85,0.08) 0%, transparent 60%); }
+[data-theme="light"] .hero-cat-gaming .hero-bg { background: linear-gradient(180deg, rgba(9,132,227,0.08) 0%, transparent 60%); }
+[data-theme="light"] .hero-cat-cities .hero-bg { background: linear-gradient(180deg, rgba(162,155,254,0.08) 0%, transparent 60%); }
+[data-theme="light"] .hero-cat-space .hero-bg { background: linear-gradient(180deg, rgba(45,52,54,0.08) 0%, transparent 60%); }
+[data-theme="light"] .hero-cat-flowers .hero-bg { background: linear-gradient(180deg, rgba(85,239,196,0.08) 0%, transparent 60%); }
+[data-theme="light"] .hero-cat-foods .hero-bg { background: linear-gradient(180deg, rgba(253,121,168,0.08) 0%, transparent 60%); }
+
+/* ══════ EMPTY GRID ══════ */
+.empty-grid {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-muted);
+}
+.empty-grid i {
+    font-size: 3rem;
+    margin-bottom: 16px;
+    display: block;
+}
+.empty-grid p {
+    font-size: 1rem;
+}
+
+/* ══════ MOBİL KATEGORİ ══════ */
+@media (max-width: 768px) {
+    .category-tabs {
+        padding: 0 0 12px;
+        gap: 6px;
+    }
+    .cat-tab {
+        padding: 8px 14px;
+        font-size: 0.8rem;
+        gap: 6px;
+    }
+    .cat-tab span:not(.cat-count) {
+        display: none;
+    }
+    .cat-tab.active span:not(.cat-count) {
+        display: inline;
+    }
+    .cat-count {
+        font-size: 0.65rem;
+        padding: 1px 6px;
+    }
+    .cat-badge {
+        width: 24px;
+        height: 24px;
+        font-size: 0.6rem;
+    }
+}
